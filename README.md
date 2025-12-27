@@ -81,24 +81,7 @@ This package provides **15 specialized modes**:
 
 ## Installation
 
-### Using the Combined Pack (Recommended)
-
-1. Copy [`system2-pack.yml`](system2-pack.yml) to your Roo Code custom modes directory:
-   ```bash
-   # macOS/Linux
-   cp system2-pack.yml ~/.roo-code/customModes/
-   
-   # Windows
-   copy system2-pack.yml %APPDATA%\roo-code\customModes\
-   ```
-
-2. Restart Roo Code or reload custom modes.
-
-3. All 15 modes will be available in the mode selector.
-
-### Using Individual Mode Files
-
-Alternatively, you can install only the modes you need by copying individual `*.yml` files from this directory.
+Download [`system2-pack.yml`](system2-pack.yml). Open your Roo Code extension in VS Code then navigate to Settings > Modes and click the "Import Modes" button. Choose between importing at the project level or global level (recommended) and then provide the downloaded `system2-pack.yml` file.
 
 ## The System 2 Workflow
 

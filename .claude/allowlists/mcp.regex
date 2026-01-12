@@ -1,0 +1,1 @@
+^(spec/mcp\.md|mcp/.*\.(md|py|ts|js|json|yaml|yml))$

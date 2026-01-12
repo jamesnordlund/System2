@@ -1,0 +1,1 @@
+^(spec/evals\.md|evals/.*\.(md|py|yaml|yml|json|toml))$

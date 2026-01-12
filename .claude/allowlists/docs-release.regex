@@ -1,0 +1,1 @@
+^(README\.md|CHANGELOG\.md|MIGRATIONS\.md|docs/.*\.md|spec/.*\.md)$

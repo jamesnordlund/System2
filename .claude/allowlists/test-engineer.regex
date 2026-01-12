@@ -1,0 +1,1 @@
+^(?!third_party/|vendor/|node_modules/|dist/|build/|out/|\.git/).*(^spec/.*\.md$|^docs/.*\.md$|.*(/__tests__/|/tests?/).*\.(py|go|java|kt|kts|ts|tsx|js|jsx|rs|c|cc|cpp|cs)$|.*(_test\.go|\.test\.(ts|tsx|js|jsx)|\.spec\.(ts|tsx|js|jsx)|test_.*\.py|.*_test\.py)$|(^|/)(BUILD|WORKSPACE)(\.bazel)?$|.*\.(yaml|yml|json|toml)$)

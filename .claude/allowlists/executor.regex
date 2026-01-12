@@ -1,0 +1,1 @@
+^(?!third_party/|vendor/|node_modules/|dist/|build/|out/|\.git/).*(^spec/.*\.md$|^docs/.*\.md$|^README\.md$|^CHANGELOG\.md$|(^|/)(BUILD|WORKSPACE)(\.bazel)?$|.*\.(py|go|java|kt|kts|ts|tsx|js|jsx|rs|c|cc|cpp|h|hpp|cs|proto|sql|yaml|yml|json|toml|sh|bazel|bzl)$)

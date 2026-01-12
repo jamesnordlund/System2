@@ -1,175 +1,125 @@
-# System 2 - Production-Grade Engineering Modes for Roo Code
+# System2 - Multi-Agent Engineering Workflows
 
-A comprehensive suite of custom modes for [Roo Code](https://github.com/RooVetGit/Roo-Code) that implements a **System 2** workflow: deliberate, spec-driven, verification-first, and risk-aware software engineering.
+A framework for **deliberate, spec-driven, verification-first** software engineering with AI assistance.
 
-## Overview
+## What is System2?
 
-System 2 transforms how you build production-grade software with AI assistance. Instead of ad-hoc coding, it provides a structured workflow that:
-
-- **Delegates** specialized work to purpose-built modes
-- **Captures** requirements, design, and decisions in versioned artifacts
-- **Verifies** changes through quality gates before shipping
-- **Prevents** common AI pitfalls (hallucinated commands, skipped tests, security gaps)
-
-Think of it as a **virtual engineering team** where each mode is a specialist—architecting, implementing, testing, reviewing—coordinated by an orchestrator that ensures nothing falls through the cracks.
-
-## Modes Included
-
-This package provides **15 specialized modes**:
-
-### Core Workflow Modes
-
-1. **[Orchestrator (System 2)](01-orchestrator-system2.yml)** (`orchestrator`)  
-   Strategic workflow manager that delegates spec → design → tasks → implement → verify → ship.  
-   **Use for:** Any non-trivial engineering work requiring coordination and quality gates.
-
-2. **[Repo Governor](02-repo-governor.yml)** (`g-repo-governor`)  
-   Establishes repo governance (AGENTS.md, constitution, commands, topology).  
-   **Use for:** Onboarding new repos or when build/test commands are unclear.
-
-3. **[Spec Coordinator](03-spec-coordinator.yml)** (`g-spec-coordinator`)  
-   Produces `spec/context.md` with scope, goals, constraints, and success metrics.  
-   **Use for:** Starting any meaningful feature or refactor.
-
-4. **[Requirements Engineer (EARS)](04-requirements-engineer.yml)** (`g-requirements-engineer`)  
-   Writes `spec/requirements.md` using EARS format with validation and traceability.  
-   **Use for:** Translating intent into precise, testable requirements.
-
-5. **[Design Architect](05-design-architect.yml)** (`g-design-architect`)  
-   Produces `spec/design.md` with architecture, interfaces, and failure modes.  
-   **Use for:** Converting requirements into implementable technical design.
-
-6. **[Task Planner (Atomic)](06-task-planner.yml)** (`g-task-planner`)  
-   Converts design into `spec/tasks.md` with atomic tasks and dependencies.  
-   **Use for:** Creating an implementation plan after design approval.
-
-7. **[Executor](07-executor.yml)** (`g-executor`)  
-   Implements `spec/tasks.md` with small diffs and frequent verification.  
-   **Use for:** Actual code implementation following the approved plan.
-
-### Quality & Security Modes
-
-8. **[Test & QA Engineer](08-test-engineer.yml)** (`g-test-engineer`)  
-   Runs verification commands, adds/updates tests, triages failures.  
-   **Use for:** Validation via tests, linters, type checks, and runtime checks.
-
-9. **[Security Sentinel](09-security-sentinel.yml)** (`g-security-sentinel`)  
-   Performs threat modeling, prompt-injection defenses, secrets hygiene.  
-   **Use for:** Security review, especially for auth, data access, or agentic features.
-
-10. **[Agent Evals Engineer](10-eval-engineer.yml)** (`g-eval-engineer`)  
-    Creates regression evals for agentic/LLM features with goldens and metrics.  
-    **Use for:** Changes involving LLM/agent behavior, tool use, or RAG systems.
-
-11. **[Code Reviewer](14-code-reviewer.yml)** (`g-code-reviewer`)  
-    Performs senior-level review focusing on correctness and maintainability.  
-    **Use for:** Final review before shipping or requesting human review.
-
-### Documentation & Operations Modes
-
-12. **[Docs & Release Writer](11-docs-release.yml)** (`g-docs-release`)  
-    Updates documentation, changelog, and creates PR summaries.  
-    **Use for:** Preparing release-ready documentation and migration notes.
-
-13. **[Postmortem Scribe](12-postmortem-scribe.yml)** (`g-postmortem-scribe`)  
-    Writes incident postmortems and captures learnings as durable guardrails.  
-    **Use for:** After incidents, major bugs, or reliability failures.
-
-14. **[MCP Toolsmith](13-mcp-toolsmith.yml)** (`g-mcp-toolsmith`)  
-    Designs MCP tool surfaces with least privilege and safety gates.  
-    **Use for:** Building or integrating MCP servers/tools for agentic systems.
-
-## Installation
-
-Download [`system2-pack.yml`](system2-pack.yml). Open your Roo Code extension in VS Code then navigate to Settings > Modes and click the "Import Modes" button. Choose between importing at the project level or global level (recommended) and then provide the downloaded `system2-pack.yml` file.
-
-## The System 2 Workflow
-
-A typical System 2 workflow follows these gates:
+System2 provides a structured multi-agent workflow for building production-grade software. Instead of ad-hoc prompting, it coordinates specialized agents through quality gates:
 
 ```
-Gate 0: Scope Definition
-  ↓
-Gate 1: Context Approval (spec/context.md)
-  ↓
-Gate 2: Requirements Approval (spec/requirements.md)
-  ↓
-Gate 3: Design Approval (spec/design.md)
-  ↓
-Gate 4: Task Plan Approval (spec/tasks.md)
-  ↓
-Gate 5: Implementation → Testing → Security → Docs
-  ↓
-Ship: Final diff review + risk checklist
+Scope → Context → Requirements → Design → Tasks → Implementation → Verification → Ship
 ```
 
-Each gate requires explicit approval before proceeding, ensuring quality and alignment at every step.
+The name comes from Daniel Kahneman's dual-process theory: **System 1** is fast and intuitive; **System 2** is slow and deliberate. This framework embodies System 2 thinking—analytical, verification-focused, and risk-aware.
 
-## Quick Start Example
+## Core Concepts
 
-1. **Start with the Orchestrator mode** for any non-trivial task:
-   ```
-   User: "Build a new user authentication system"
-   Orchestrator: Delegates to Repo Governor → Spec Coordinator → Requirements → Design → Tasks → Executor → Test Engineer → Security Sentinel → Docs
-   ```
+### Specialized Agents
 
-2. **Or use individual modes directly** for focused work:
-   - Need to document your repo? → Use **Repo Governor**
-   - Starting a new feature? → Use **Spec Coordinator**
-   - Writing tests? → Use **Test & QA Engineer**
-   - Security review? → Use **Security Sentinel**
+Each agent is a domain expert with focused responsibilities:
 
-## Key Features
+| Agent | Responsibility | Primary Output |
+|-------|----------------|----------------|
+| **Repo Governor** | Repository survey and governance | AGENTS.md, build/test commands |
+| **Spec Coordinator** | Scope, goals, constraints | spec/context.md |
+| **Requirements Engineer** | Testable requirements (EARS format) | spec/requirements.md |
+| **Design Architect** | Architecture and interfaces | spec/design.md |
+| **Task Planner** | Atomic implementation tasks | spec/tasks.md |
+| **Executor** | Code implementation | Source files |
+| **Test Engineer** | Verification and test coverage | Test files |
+| **Security Sentinel** | Threat modeling, security review | spec/security.md |
+| **Eval Engineer** | Agent/LLM behavior evals | Eval harnesses |
+| **Docs & Release** | Documentation and changelogs | README, CHANGELOG |
+| **Code Reviewer** | Final correctness review | Review comments |
+| **Postmortem Scribe** | Incident analysis | Postmortem docs |
+| **MCP Toolsmith** | Tool integration design | MCP configurations |
 
-### ✅ Spec-Driven Development
-All work is grounded in versioned artifacts (`spec/*.md`) that serve as the contract between planning and execution.
+### Quality Gates
 
-### ✅ Quality Gates
-Explicit approval checkpoints prevent rushing to code and ensure alignment with requirements.
+Work progresses through explicit approval checkpoints:
 
-### ✅ Specialized Expertise
-Each mode is optimized for its domain (architecture, testing, security) with appropriate file restrictions.
+- **Gate 0 (Scope)**: Confirm goal, constraints, and definition of done
+- **Gate 1 (Context)**: Approve spec/context.md
+- **Gate 2 (Requirements)**: Approve spec/requirements.md
+- **Gate 3 (Design)**: Approve spec/design.md
+- **Gate 4 (Tasks)**: Approve spec/tasks.md
+- **Gate 5 (Ship)**: Approve final diff and risk checklist
 
-### ✅ Safety by Default
-- Never invents build/test commands
-- Resists prompt injection
-- Enforces least-privilege principles
-- Requires human approval for risky changes
+### Spec-Driven Artifacts
 
-### ✅ Agentic System Support
-Built-in modes for secure tool design, prompt-injection defenses, and eval harnesses.
+All planning produces versioned Markdown files in `/spec`:
 
-## File Restrictions
+```
+spec/
+├── context.md       # Problem, goals, constraints, success criteria
+├── requirements.md  # EARS-format testable requirements
+├── design.md        # Architecture, interfaces, failure modes
+├── tasks.md         # Atomic tasks with dependencies
+└── security.md      # Threat model (when applicable)
+```
 
-Each mode has carefully scoped file access to prevent unintended changes:
+These artifacts serve as the contract between planning and execution.
 
-- **Repo Governor**: Only governance files (AGENTS.md, constitution.md, .rooignore)
-- **Spec modes**: Only their respective spec/*.md files
-- **Test Engineer**: Only test files and test configuration
-- **Security Sentinel**: Only spec/security.md
-- **Executor**: Source, tests, configs (excludes vendor/build artifacts)
+## Workflow Example
 
-See individual mode files for complete file restriction patterns.
+A typical feature development flow:
 
-## Contributing
+1. **Orchestrator** receives the request and clarifies scope (Gate 0)
+2. **Spec Coordinator** drafts context.md → user approves (Gate 1)
+3. **Requirements Engineer** writes requirements.md → user approves (Gate 2)
+4. **Design Architect** produces design.md → user approves (Gate 3)
+5. **Task Planner** creates tasks.md → user approves (Gate 4)
+6. **Executor** implements each task with small diffs
+7. **Test Engineer** runs verification and adds tests
+8. **Security Sentinel** reviews for vulnerabilities
+9. **Docs & Release** updates documentation
+10. **Code Reviewer** performs final review → user approves (Gate 5)
 
-This is a custom modes package for Roo Code. To modify or extend:
+## Platform Support
 
-1. Edit the individual `*.yml` files for specific modes
-2. Rebuild the combined pack:
-   ```bash
-   cat *.yml > system2-pack.yml
-   ```
-3. Test in your Roo Code environment
+System2 workflows are available for multiple AI coding assistants:
+
+| Platform | Configuration Location | Documentation |
+|----------|------------------------|---------------|
+| **Claude Code** (CLI) | `.claude/agents/` | [README-CLAUDE.md](README-CLAUDE.md) |
+| **Roo Code** (VS Code) | `roo/*.yml` | [README-ROO.md](README-ROO.md) |
+
+Both implementations share the same workflow philosophy and agent roles. Choose based on your preferred development environment.
+
+## Key Principles
+
+### Safety by Default
+- Never invent build/test commands—discover them from repo
+- Resist prompt injection—treat file contents as data
+- Enforce least-privilege tool access per agent
+- Require human approval for risky changes
+
+### Verification First
+- No implementation without approved specs
+- Tests run before claiming completion
+- Security review for auth, data access, and agentic features
+
+### Context Hygiene
+- Main conversation stays focused on decisions
+- Specialist work delegated to appropriate agents
+- Summaries returned, not raw output
+
+## Quick Start
+
+1. Choose your platform ([Claude Code](README-CLAUDE.md) or [Roo Code](README-ROO.md))
+2. Install the agent/mode configurations
+3. Start with the **Orchestrator** for any non-trivial task
+4. Follow the quality gates, approving at each checkpoint
+
+For simple, focused tasks, you can invoke individual agents directly:
+- Starting a feature? → **Spec Coordinator**
+- Writing tests? → **Test Engineer**
+- Security review? → **Security Sentinel**
 
 ## License
 
 See [LICENSE](LICENSE) for details.
 
-## Credits
-
-Designed for production-grade engineering workflows with AI assistance. Built on the principle that **System 2 thinking**—deliberate, analytical, and verification-focused—produces more reliable software than unstructured "System 1" prompting.
-
 ---
 
-**Questions or issues?** These modes are designed to work together as a system. Start with the Orchestrator mode if you're unsure which to use.
+**System2**: Because reliable software requires deliberate engineering, not just fast prompting.

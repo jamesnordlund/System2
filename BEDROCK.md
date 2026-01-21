@@ -1,6 +1,6 @@
 # AWS Bedrock Integration for System2
 
-System2 now defaults to AWS Bedrock with Claude 3.5 Sonnet for enterprise-grade AI model serving.
+System2 now supports AWS Bedrock with Claude 3.5 Sonnet as an **optional enterprise model provider**.
 
 ## Quick Start
 
@@ -23,7 +23,7 @@ System2 now defaults to AWS Bedrock with Claude 3.5 Sonnet for enterprise-grade 
    python3 lib/bedrock_client.py
    ```
 
-3. **Start using System2** - Bedrock is now the default provider!
+3. **Enable Bedrock in System2** - Set `default_provider: bedrock` in config!
 
 ## Configuration
 
@@ -40,7 +40,7 @@ providers:
       max_tokens: 4096
 
 global:
-  default_provider: bedrock  # Default to Bedrock
+  default_provider: native   # Native is default (change to 'bedrock' to enable)
 ```
 
 ## Available Models

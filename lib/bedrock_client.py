@@ -94,8 +94,20 @@ class BedrockClient:
             return False
             
         try:
-            # Test with a minimal request
-            self.client.list_foundation_models()
+            # Test with a minimal invocation to check if service is accessible
+            # Use a very small request to minimize cost
+            test_body = {
+                "anthropic_version": "bedrock-2023-05-31",
+                "messages": [{"role": "user", "content": "Hi"}],
+                "max_tokens": 1,
+                "temperature": 0
+            }
+            
+            self.client.invoke_model(
+                modelId=self.default_model,
+                body=json.dumps(test_body),
+                contentType="application/json"
+            )
             return True
         except Exception as e:
             logger.error(f"Bedrock availability check failed: {e}")

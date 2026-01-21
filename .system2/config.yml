@@ -54,7 +54,7 @@ providers:
 # Global Settings
 global:
   # Default provider when not specified in agent/mode config
-  default_provider: bedrock
+  default_provider: native
   
   # Enable request logging (no sensitive data logged)
   logging:

@@ -1,29 +1,27 @@
 # AWS Bedrock Integration for System2
 
-System2 now supports AWS Bedrock with Claude 3.5 Sonnet as an **optional enterprise model provider**.
+Add **enterprise-grade AI** to System2 with AWS Bedrock and Claude 3.5 Sonnet.
+
+## When to Use Bedrock
+
+Choose Bedrock over native Claude when you need:
+- **Enterprise compliance** (VPC, logging, governance)
+- **Cost tracking** and usage controls
+- **AWS integration** (IAM, CloudTrail, etc.)
+- **Performance** optimized for your AWS region
 
 ## Quick Start
 
-1. **Configure AWS credentials** (choose one):
+1. **Set AWS credentials**:
    ```bash
-   # Option 1: Environment variables
    export AWS_ACCESS_KEY_ID="your-key"
    export AWS_SECRET_ACCESS_KEY="your-secret"
    export AWS_DEFAULT_REGION="us-west-2"
-   
-   # Option 2: AWS CLI profile
-   aws configure --profile default
-   
-   # Option 3: IAM role (for EC2/ECS environments)
-   # Automatically detected
    ```
 
-2. **Verify Bedrock access**:
-   ```bash
-   python3 lib/bedrock_client.py
-   ```
+2. **Enable Bedrock**: Set `default_provider: bedrock` in `.system2/config.yml`
 
-3. **Enable Bedrock in System2** - Set `default_provider: bedrock` in config!
+3. **Test**: `python3 lib/bedrock_client.py`
 
 ## Configuration
 
@@ -76,32 +74,13 @@ customModes:
       max_tokens: 4096
 ```
 
-## Authentication Methods
+## Authentication Options
 
-### 1. Environment Variables (Recommended for Development)
-```bash
-export AWS_ACCESS_KEY_ID="AKIAEXAMPLE"
-export AWS_SECRET_ACCESS_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-export AWS_DEFAULT_REGION="us-west-2"
-```
-
-### 2. AWS Profile
-```yaml
-# .system2/config.yml
-providers:
-  bedrock:
-    auth:
-      profile: my-profile
-```
-
-### 3. IAM Role Assumption
-```yaml
-# .system2/config.yml
-providers:
-  bedrock:
-    auth:
-      role_arn: arn:aws:iam::123456789012:role/System2BedrockRole
-```
+| Method | Use Case | Configuration |
+|--------|----------|---------------|
+| **Environment vars** | Development | `export AWS_ACCESS_KEY_ID=...` |
+| **AWS Profile** | Multi-account | `auth: { profile: my-profile }` |
+| **IAM Role** | Production | `auth: { role_arn: arn:aws:... }` |
 
 ## Cost Management
 
@@ -133,52 +112,20 @@ providers:
 
 ## Troubleshooting
 
-### Authentication Issues
-```bash
-# Check AWS credentials
-aws sts get-caller-identity
+| Issue | Solution |
+|-------|----------|
+| **Auth failed** | `aws sts get-caller-identity` |
+| **Model access denied** | Add `bedrock:InvokeModel` permission |
+| **Region error** | Use `us-west-2`, `us-east-1`, or `eu-west-1` |
 
-# Test Bedrock access
-aws bedrock list-foundation-models --region us-west-2
-```
+**Required IAM permission**: `bedrock:InvokeModel` on Claude model resources.
 
-### Permission Requirements
-Your AWS credentials need:
-- `bedrock:InvokeModel`
-- `bedrock:ListFoundationModels`
+## Migration Strategy
 
-Example IAM policy:
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "bedrock:InvokeModel",
-                "bedrock:ListFoundationModels"
-            ],
-            "Resource": [
-                "arn:aws:bedrock:*::foundation-model/anthropic.claude-3-5-sonnet-20241022-v1:0",
-                "arn:aws:bedrock:*::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0"
-            ]
-        }
-    ]
-}
-```
+| Step | Action | Impact |
+|------|--------|--------|
+| **Phase 1** | Keep existing setup | Zero disruption |
+| **Phase 2** | Add `provider: bedrock` to select agents | Gradual testing |
+| **Phase 3** | Set `default_provider: bedrock` | Full migration |
 
-### Model Availability
-Claude 3.5 models are available in these regions:
-- `us-west-2` (Oregon) - Recommended
-- `us-east-1` (N. Virginia)
-- `eu-west-1` (Ireland)
-
-## Migration from Native
-
-System2 maintains full backward compatibility. To migrate:
-
-1. **Keep existing agents/modes unchanged** - they continue working with native providers
-2. **Gradually opt-in to Bedrock** by adding `provider: bedrock` to specific agents
-3. **Update global default** when ready: `default_provider: bedrock`
-
-No code changes required for existing System2 workflows!
+**No code changes required** - existing workflows continue unchanged.

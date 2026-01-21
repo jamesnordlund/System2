@@ -110,12 +110,12 @@ cat .system2/config.yml
 
 ## Migration Path
 
-**Zero-disruption migration**:
+**Zero-disruption opt-in**:
 
-1. **Phase 1**: Existing users continue with native providers automatically
-2. **Phase 2**: Users can opt-in by configuring AWS credentials  
-3. **Phase 3**: Bedrock becomes default for new setups (this PR)
-4. **Phase 4**: Users migrate individual agents/modes as needed
+1. **Existing users**: Continue with native providers automatically
+2. **New capability**: Users can opt-in by configuring AWS credentials
+3. **Gradual adoption**: Add `provider: bedrock` to specific agents as needed
+4. **Global switch**: Set `default_provider: bedrock` when ready
 
 ## Backward Compatibility
 
@@ -158,24 +158,12 @@ cat .system2/config.yml
 - **Security Impact**: Enhanced (enterprise-grade AWS security)
 - **Maintenance Burden**: Minimal (well-architected, documented code)
 
-## Future Considerations
+## Review Checklist
 
-This implementation provides a foundation for:
-- Additional Bedrock models (Claude Opus, other providers)
-- Advanced Bedrock features (custom models, guardrails)
-- Cost optimization and usage analytics
-- Multi-region deployment strategies
+- ✅ **Security**: AWS credential handling with best practices
+- ✅ **Compatibility**: Zero breaking changes, native providers remain default
+- ✅ **Documentation**: Complete setup guide in BEDROCK.md
+- ✅ **Configuration**: Flexible opt-in design with sensible defaults
+- ✅ **Testing**: Bedrock client with error handling and fallback
 
-## Review Focus Areas
-
-1. **Security**: Credential handling and authentication flow
-2. **Backward Compatibility**: Existing workflow preservation
-3. **Error Handling**: Fallback mechanisms and user experience  
-4. **Documentation**: Setup clarity and troubleshooting guidance
-5. **Configuration**: Flexibility and sensible defaults
-
----
-
-**Ready for review and merge!** 🚀
-
-This PR enables System2 to leverage AWS Bedrock's enterprise capabilities while maintaining the framework's core principles of deliberate, spec-driven engineering workflows.
+**Ready for merge** - adds enterprise AI capabilities while preserving System2's core engineering workflows.

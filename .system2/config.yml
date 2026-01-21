@@ -1,0 +1,97 @@
+# System2 Configuration
+# This file enables extended model provider support beyond the default Claude Code/Roo Code implementations
+
+version: "1.0"
+
+# Model Provider Configuration
+providers:
+  # AWS Bedrock Configuration
+  bedrock:
+    # Enable Bedrock as a model provider
+    enabled: true
+    
+    # AWS Region (defaults to AWS_DEFAULT_REGION env var)
+    region: us-west-2
+    
+    # Default model for Bedrock operations
+    default_model: claude-3-5-sonnet-20241022
+    
+    # Default parameters for all Bedrock requests
+    defaults:
+      temperature: 0.7
+      max_tokens: 4096
+      top_p: 0.9
+    
+    # Authentication method priority order
+    # 1. Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+    # 2. AWS profile from ~/.aws/credentials
+    # 3. IAM role assumption
+    auth:
+      profile: default  # AWS profile name, optional
+      # role_arn: arn:aws:iam::ACCOUNT:role/System2BedrockRole  # Optional IAM role
+    
+    # Available Claude 4.5 models on Bedrock
+    models:
+      claude-3-5-sonnet-20241022:
+        display_name: "Claude 3.5 Sonnet"
+        description: "Most capable model, balanced performance and cost"
+        max_tokens: 8192
+        cost_tier: "standard"
+      claude-3-5-haiku-20241022:
+        display_name: "Claude 3.5 Haiku"  
+        description: "Fastest model, optimized for speed and cost"
+        max_tokens: 8192
+        cost_tier: "economy"
+  
+  # Native provider (Claude Code/Roo Code default)
+  native:
+    # Enable native as fallback when Bedrock is unavailable
+    fallback: true
+    
+    # Timeout before falling back to native (seconds)
+    fallback_timeout: 10
+
+# Global Settings
+global:
+  # Default provider when not specified in agent/mode config
+  default_provider: bedrock
+  
+  # Enable request logging (no sensitive data logged)
+  logging:
+    enabled: true
+    level: INFO
+    
+  # Retry configuration
+  retry:
+    max_attempts: 3
+    backoff_factor: 2
+    
+  # Cost controls
+  cost_controls:
+    # Warn when estimated costs exceed threshold per session
+    session_cost_warning_usd: 5.0
+    
+    # Maximum tokens per request across all providers
+    max_tokens_per_request: 8192
+
+# Agent-specific overrides (optional)
+# These settings can be overridden in individual .claude/agents/*.md files
+agent_overrides:
+  # Example: Use Bedrock's faster model for simpler coordination tasks
+  spec-coordinator:
+    provider: bedrock
+    model: claude-3-5-haiku-20241022
+    temperature: 0.5
+    
+  # Example: Use Bedrock's most capable model for complex design work  
+  design-architect:
+    provider: bedrock
+    model: claude-3-5-sonnet-20241022
+    temperature: 0.3
+
+# Mode-specific overrides for Roo Code (optional)
+mode_overrides:
+  # Example: Use Bedrock for all governance modes
+  g-repo-governor:
+    provider: bedrock
+    model: claude-3-5-sonnet-20241022

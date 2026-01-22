@@ -1,13 +1,13 @@
-# Pull Request Proposal: AWS Bedrock Claude 3.5 Sonnet Integration
+# Pull Request Proposal: AWS Bedrock Claude Sonnet 4 Integration
 
 ## Summary
 
-This PR adds **optional AWS Bedrock support** to System2, enabling enterprise-grade AI model serving with Claude 3.5 Sonnet while maintaining native Claude providers as the default.
+This PR adds **optional AWS Bedrock support** to System2, enabling enterprise-grade AI model serving with Claude Sonnet 4 while maintaining native Claude providers as the default.
 
 ## Key Features
 
 ### 🚀 **Optional Bedrock Provider**
-- Claude 3.5 Sonnet (`claude-3-5-sonnet-20241022`) available via AWS Bedrock
+- Claude Sonnet 4 (`us.anthropic.claude-sonnet-4-20250514-v1:0`) available via AWS Bedrock
 - Native providers (Claude Code CLI/Roo Code) remain the default
 - Easy opt-in configuration - set `default_provider: bedrock` when needed
 - Zero breaking changes - existing workflows continue working
@@ -46,7 +46,7 @@ README.md              (MODIFIED) - Added model provider info
 providers:
   bedrock:
     enabled: true
-    default_model: claude-3-5-sonnet-20241022
+    default_model: us.anthropic.claude-sonnet-4-20250514-v1:0
     region: us-west-2
 
 global:
@@ -58,7 +58,7 @@ global:
 ---
 name: design-architect
 provider: bedrock
-bedrockModel: claude-3-5-sonnet-20241022
+bedrockModel: us.anthropic.claude-sonnet-4-20250514-v1:0
 temperature: 0.3
 ---
 ```
@@ -66,7 +66,7 @@ temperature: 0.3
 ## Benefits
 
 1. **🏢 Enterprise Ready**: AWS Bedrock provides enterprise-grade security, compliance, and governance
-2. **⚡ Performance**: Access to latest Claude 3.5 capabilities with optimized AWS infrastructure  
+2. **⚡ Performance**: Access to latest Claude Sonnet 4 capabilities with optimized AWS infrastructure
 3. **💵 Cost Control**: Bedrock pricing model with built-in usage tracking
 4. **🔄 Reliability**: Automatic fallback ensures uninterrupted workflows
 5. **📈 Scalability**: Enterprise features like VPC endpoints, CloudTrail logging, etc.
@@ -137,8 +137,8 @@ cat .system2/config.yml
                 "bedrock:InvokeModel"
             ],
             "Resource": [
-                "arn:aws:bedrock:*::foundation-model/anthropic.claude-3-5-sonnet-20241022-v1:0",
-                "arn:aws:bedrock:*::foundation-model/anthropic.claude-3-5-haiku-20241022-v1:0"
+                "arn:aws:bedrock:*::foundation-model/us.anthropic.claude-sonnet-4-20250514-v1:0",
+                "arn:aws:bedrock:*::foundation-model/us.anthropic.claude-haiku-4-5-20251001-v1:0"
             ]
         }
     ]

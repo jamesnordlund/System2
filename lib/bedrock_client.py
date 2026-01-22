@@ -34,7 +34,7 @@ class BedrockClient:
         
         # Model mappings
         self.models = self.bedrock_config.get("models", {})
-        self.default_model = self.bedrock_config.get("default_model", "claude-3-5-sonnet-20241022")
+        self.default_model = self.bedrock_config.get("default_model", "us.anthropic.claude-sonnet-4-20250514-v1:0")
         
     def _load_config(self, config_path: str) -> Dict[str, Any]:
         """Load System2 configuration file."""
@@ -203,10 +203,10 @@ class BedrockClient:
         Estimate the cost of a model invocation.
         Note: These are approximate rates and should be updated based on current AWS pricing.
         """
-        # Approximate pricing per 1K tokens (as of 2024)
+        # Approximate pricing per 1K tokens (as of 2025)
         pricing = {
-            "claude-3-5-sonnet-20241022": {"input": 0.003, "output": 0.015},
-            "claude-3-5-haiku-20241022": {"input": 0.00025, "output": 0.00125}
+            "us.anthropic.claude-sonnet-4-20250514-v1:0": {"input": 0.003, "output": 0.015},
+            "us.anthropic.claude-haiku-4-5-20251001-v1:0": {"input": 0.00025, "output": 0.00125}
         }
         
         rates = pricing.get(model_id, {"input": 0.003, "output": 0.015})

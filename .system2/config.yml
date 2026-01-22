@@ -14,7 +14,7 @@ providers:
     region: us-west-2
     
     # Default model for Bedrock operations
-    default_model: claude-3-5-sonnet-20241022
+    default_model: us.anthropic.claude-sonnet-4-20250514-v1:0
     
     # Default parameters for all Bedrock requests
     defaults:
@@ -30,15 +30,15 @@ providers:
       profile: default  # AWS profile name, optional
       # role_arn: arn:aws:iam::ACCOUNT:role/System2BedrockRole  # Optional IAM role
     
-    # Available Claude 4.5 models on Bedrock
+    # Available Claude 4 models on Bedrock (using inference profiles)
     models:
-      claude-3-5-sonnet-20241022:
-        display_name: "Claude 3.5 Sonnet"
-        description: "Most capable model, balanced performance and cost"
+      us.anthropic.claude-sonnet-4-20250514-v1:0:
+        display_name: "Claude Sonnet 4"
+        description: "Most capable model, advanced reasoning and coding"
         max_tokens: 8192
         cost_tier: "standard"
-      claude-3-5-haiku-20241022:
-        display_name: "Claude 3.5 Haiku"  
+      us.anthropic.claude-haiku-4-5-20251001-v1:0:
+        display_name: "Claude Haiku 4.5"
         description: "Fastest model, optimized for speed and cost"
         max_tokens: 8192
         cost_tier: "economy"
@@ -80,13 +80,13 @@ agent_overrides:
   # Example: Use Bedrock's faster model for simpler coordination tasks
   spec-coordinator:
     provider: bedrock
-    model: claude-3-5-haiku-20241022
+    model: us.anthropic.claude-haiku-4-5-20251001-v1:0
     temperature: 0.5
     
   # Example: Use Bedrock's most capable model for complex design work  
   design-architect:
     provider: bedrock
-    model: claude-3-5-sonnet-20241022
+    model: us.anthropic.claude-sonnet-4-20250514-v1:0
     temperature: 0.3
 
 # Mode-specific overrides for Roo Code (optional)
@@ -94,4 +94,4 @@ mode_overrides:
   # Example: Use Bedrock for all governance modes
   g-repo-governor:
     provider: bedrock
-    model: claude-3-5-sonnet-20241022
+    model: us.anthropic.claude-sonnet-4-20250514-v1:0

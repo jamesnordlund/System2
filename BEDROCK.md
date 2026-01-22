@@ -1,6 +1,6 @@
 # AWS Bedrock Integration for System2
 
-Add **enterprise-grade AI** to System2 with AWS Bedrock and Claude 3.5 Sonnet.
+Add **enterprise-grade AI** to System2 with AWS Bedrock and Claude Sonnet 4.
 
 ## When to Use Bedrock
 
@@ -31,7 +31,7 @@ System2 uses `.system2/config.yml` for provider configuration:
 providers:
   bedrock:
     enabled: true
-    default_model: claude-3-5-sonnet-20241022
+    default_model: us.anthropic.claude-sonnet-4-20250514-v1:0
     region: us-west-2
     defaults:
       temperature: 0.7
@@ -45,8 +45,8 @@ global:
 
 | Model ID | Name | Description | Use Case |
 |----------|------|-------------|----------|
-| `claude-3-5-sonnet-20241022` | Claude 3.5 Sonnet | Most capable, balanced | Default for all agents |
-| `claude-3-5-haiku-20241022` | Claude 3.5 Haiku | Fastest, most economical | Quick tasks, coordination |
+| `us.anthropic.claude-sonnet-4-20250514-v1:0` | Claude Sonnet 4 | Most capable, advanced reasoning | Default for all agents |
+| `us.anthropic.claude-haiku-4-5-20251001-v1:0` | Claude Haiku 4.5 | Fastest, most economical | Quick tasks, coordination |
 
 ## Agent Configuration
 
@@ -57,7 +57,7 @@ global:
 name: design-architect
 model: claude-3-5-sonnet      # Native model name
 provider: bedrock             # NEW: Use Bedrock
-bedrockModel: claude-3-5-sonnet-20241022  # NEW: Bedrock model ID
+bedrockModel: us.anthropic.claude-sonnet-4-20250514-v1:0  # NEW: Bedrock inference profile ID
 temperature: 0.3              # NEW: Override default
 ---
 ```
@@ -69,7 +69,7 @@ customModes:
   - slug: g-design-architect
     provider: bedrock           # NEW: Use Bedrock
     modelConfig:               # NEW: Bedrock configuration
-      model: claude-3-5-sonnet-20241022
+      model: us.anthropic.claude-sonnet-4-20250514-v1:0
       temperature: 0.3
       max_tokens: 4096
 ```
@@ -95,8 +95,8 @@ global:
 ```
 
 Approximate costs (per 1K tokens):
-- **Claude 3.5 Sonnet**: $0.003 input / $0.015 output
-- **Claude 3.5 Haiku**: $0.00025 input / $0.00125 output
+- **Claude Sonnet 4**: $0.003 input / $0.015 output
+- **Claude Haiku 4.5**: $0.00025 input / $0.00125 output
 
 ## Fallback Behavior
 

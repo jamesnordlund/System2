@@ -89,18 +89,29 @@ temperature: 0.3
 
 ## Testing Guidance
 
-The implementation includes:
-- ✅ Authentication validation
-- ✅ Model availability checks  
-- ✅ Error handling and fallback
-- ✅ Cost estimation
-- ✅ Configuration validation
+The implementation includes **comprehensive testing** with both API-level and System2 integration validation:
 
-### Test Commands
+### ✅ Bedrock API Testing
 ```bash
-# Test Bedrock client
+# Test direct Bedrock connectivity
 python3 lib/bedrock_client.py
+```
+**Results:** Authentication ✅, Model access ✅, Cost tracking ✅
 
+### ✅ System2 Integration Testing
+```bash
+# Test full System2 workflow simulation
+python3 test_system2_integration.py
+```
+**Results:** All 5 integration tests pass:
+- **Configuration Loading**: ✅ Loads `.system2/config.yml` correctly
+- **Provider Selection**: ✅ Agent-level overrides work (`provider: bedrock`)
+- **Bedrock Initialization**: ✅ Client connects and lists available models
+- **Agent Invocation**: ✅ Both native and Bedrock agents respond correctly
+- **Fallback Behavior**: ✅ Graceful degradation when Bedrock unavailable
+
+### Additional Verification
+```bash
 # Verify AWS access
 aws bedrock list-foundation-models --region us-west-2
 

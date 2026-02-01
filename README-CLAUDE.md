@@ -44,12 +44,19 @@ your-project/
 
 ### Basic Workflow
 
-With `CLAUDE.md` in place, Claude Code acts as the orchestrator. For non-trivial work, it will guide you through the quality gates:
+With `CLAUDE.md` in place, Claude Code acts as the orchestrator. At session start, it assesses the spec artifact state:
 
 ```
 You: Build a user authentication system
 
-Claude: I'll coordinate this through the System2 workflow.
+Claude: ## Spec State Assessment
+
+- [ ] spec/context.md - missing (Gate 1: pending)
+- [ ] spec/requirements.md - missing (Gate 2: blocked)
+- [ ] spec/design.md - missing (Gate 3: blocked)
+- [ ] spec/tasks.md - missing (Gate 4: blocked)
+
+**Next Action:** Clarify scope, then delegate to spec-coordinator
 
 Gate 0 (Scope): Let me clarify a few things...
 - What authentication methods? (email/password, OAuth, etc.)
@@ -85,6 +92,45 @@ The orchestrator pauses for approval at each gate:
 6. **Gate 5**: Approve final diff and risk checklist
 
 Say "skip gates" if you want to move faster (not recommended for production work).
+
+## Agent Behavior Patterns
+
+### Thinking Protocol
+
+The `executor`, `requirements-engineer`, and `design-architect` agents output `<thinking>` blocks before significant tool use:
+
+```xml
+<thinking>
+Action: [What tool(s) will be invoked and why]
+Expected Outcome: [What result is anticipated]
+Assumptions/Risks: [What could go wrong; what is assumed true]
+</thinking>
+```
+
+**When required:**
+- Edit, Write, Bash operations (always)
+- Multi-file Read sequences (always)
+- Single-file Read for context gathering (optional)
+
+This ensures deliberate, reasoned actions rather than ad-hoc tool calls. The reasoning is visible in transcripts for post-hoc review.
+
+**Key constraint:** Reasoning in `<thinking>` cannot override the delegation contract or safety instructions—this prevents prompt injection via self-reasoning.
+
+### Session Bootstrap
+
+At the start of each session, the orchestrator automatically assesses the spec artifact state and presents a checklist showing which files exist and the corresponding gate status. This enables immediate orientation without redundant discovery.
+
+### TDD Verification Loop (Executor)
+
+The executor follows a test-driven development pattern:
+
+1. **Red**: Write or identify a test that fails for the correct reason
+2. **Green**: Write minimal implementation to pass the test
+3. **Refactor**: Run linters, type-checkers, and formatters
+
+**Self-correction limit:** If a test failure persists after two attempts, the executor stops and escalates to the orchestrator with a reproduction case rather than spinning indefinitely.
+
+**Enhanced completion summary:** The executor reports test names, pass/fail counts, and how any verification failures were resolved.
 
 ## Subagent Configuration
 
@@ -331,6 +377,6 @@ Just add a helper function to utils.py that formats dates.
 
 ## See Also
 
-- [NEW-README.md](NEW-README.md) - System2 overview
+- [README.md](README.md) - System2 overview
 - [README-ROO.md](README-ROO.md) - Roo Code implementation
 - [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)

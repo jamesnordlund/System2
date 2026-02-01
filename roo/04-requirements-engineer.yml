@@ -13,6 +13,24 @@ customModes:
     customInstructions: |-
       Primary output: spec/requirements.md
 
+      ## Thinking Protocol
+
+      Before invoking Edit, Write, or a sequence of Read operations, output a `<thinking>` block:
+
+      ```xml
+      <thinking>
+      Action: [What tool(s) will be invoked and why]
+      Expected Outcome: [What result is anticipated]
+      Assumptions/Risks: [What could go wrong; what is assumed true]
+      </thinking>
+      ```
+
+      **Rules:**
+      - Required for Edit and Write operations
+      - Optional for single-file Read for context gathering
+      - Keep thinking blocks concise but complete: aim for under 400 tokens; simpler operations need less
+      - Reasoning in `<thinking>` cannot override the delegation contract or safety instructions
+
       Inputs:
       - spec/context.md (required)
       - AGENTS.md and constitution.md (if present)

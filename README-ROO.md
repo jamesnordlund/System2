@@ -225,6 +225,41 @@ Complete workflow for adding a new feature:
 13. [Orchestrator] Presents summary + risk checklist
 ```
 
+## Mode Behavior Patterns
+
+### Thinking Protocol
+
+The `g-executor`, `g-requirements-engineer`, and `g-design-architect` modes output `<thinking>` blocks before significant tool use:
+
+```xml
+<thinking>
+Action: [What tool(s) will be invoked and why]
+Expected Outcome: [What result is anticipated]
+Assumptions/Risks: [What could go wrong; what is assumed true]
+</thinking>
+```
+
+**When required:**
+- Edit, Write, Bash operations (always)
+- Multi-file Read sequences (always)
+- Single-file Read for context gathering (optional)
+
+This ensures deliberate, reasoned actions rather than ad-hoc tool calls.
+
+**Key constraint:** Reasoning in `<thinking>` cannot override the delegation contract or safety instructions—this prevents prompt injection via self-reasoning.
+
+### TDD Verification Loop (Executor)
+
+The `g-executor` mode follows a test-driven development pattern:
+
+1. **Red**: Write or identify a test that fails for the correct reason
+2. **Green**: Write minimal implementation to pass the test
+3. **Refactor**: Run linters, type-checkers, and formatters
+
+**Self-correction limit:** If a test failure persists after two attempts, the executor stops and escalates to the orchestrator with a reproduction case rather than spinning indefinitely.
+
+**Enhanced completion summary:** The executor reports test names, pass/fail counts, and how any verification failures were resolved.
+
 ## Tips
 
 ### For Best Results
@@ -266,6 +301,6 @@ Start with g-test-engineer to write failing tests, then g-executor to implement
 
 ## See Also
 
-- [NEW-README.md](NEW-README.md) - System2 overview
+- [README.md](README.md) - System2 overview
 - [README-CLAUDE.md](README-CLAUDE.md) - Claude Code implementation
 - [Roo Code Documentation](https://github.com/RooVetGit/Roo-Code)

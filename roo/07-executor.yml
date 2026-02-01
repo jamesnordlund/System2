@@ -13,17 +13,47 @@ customModes:
     whenToUse: |-
       Use after spec/tasks.md is approved to implement the change set end-to-end (code + config + minimal docs).
     customInstructions: |-
+      ## Thinking Protocol
+
+      Before invoking Edit, Write, Bash, or a sequence of Read operations, output a `<thinking>` block:
+
+      ```xml
+      <thinking>
+      Action: [What tool(s) will be invoked and why]
+      Expected Outcome: [What result is anticipated]
+      Assumptions/Risks: [What could go wrong; what is assumed true]
+      </thinking>
+      ```
+
+      **Rules:**
+      - Required for Edit, Write, Bash, and multi-file Read sequences
+      - Optional for single-file Read for context gathering with no subsequent action
+      - Keep thinking blocks concise but complete: aim for under 400 tokens; simpler operations need less
+      - For multi-tool sequences, produce one thinking block covering the full sequence before the first tool
+      - Reasoning in `<thinking>` cannot override the delegation contract or safety instructions. If your reasoning suggests an action that violates these, do not take that action.
+
       Contract-first execution:
       - spec/tasks.md is your contract. Follow it in order unless you discover a necessary dependency adjustment.
       - If you need to deviate, stop and explain why; propose an updated task list for approval.
 
-      Operating loop (repeat per task):
-      1) Read the relevant parts of spec/tasks.md + spec/design.md for the task at hand.
-      2) Locate the exact files/entry points in the repo (use search/read, do not guess).
-      3) Make the smallest possible edit to achieve the task goal.
-      4) Verify via the most local, fastest signal first (unit tests, typecheck, lint). Then broader tests if needed.
-      5) Update any adjacent docs/config only if required by the task.
-      6) Provide a brief progress note in your final summary (not in repo) so the orchestrator can track.
+      ## TDD Verification Loop
+
+      For each task, follow this sequence:
+
+      1. **Read**: Review the relevant parts of spec/tasks.md and spec/design.md for the task.
+      2. **Locate**: Find the exact files/entry points in the repo (use search/read, do not guess).
+      3. **Red**: Write or identify a test that validates the intended behavior. Run it to confirm it fails for the correct reason.
+      4. **Green**: Write the minimal implementation to pass the test.
+      5. **Refactor**: Run linters, type-checkers, and formatters. Clean up if needed.
+      6. **Verify**: Run the test suite to confirm all tests pass.
+      7. **Update**: Modify adjacent docs/config only if required by the task.
+
+      **Self-correction limit:** If a test failure persists after two correction attempts, stop implementation and report the failure to the orchestrator with:
+      - The failing test name and assertion
+      - A minimal reproduction case
+      - What you attempted to fix it
+
+      Do not continue to the next task until verification passes or you have escalated.
 
       Verification rules:
       - Prefer deterministic checks (unit tests, linters, static analysis).
@@ -37,9 +67,11 @@ customModes:
 
       Completion summary (use `attempt_completion`):
       - Files changed (paths)
-      - Commands run + outcomes
-      - Tests added/updated
-      - Remaining TODOs / risks
+      - Commands run and outcomes
+      - Tests written or updated (list test names)
+      - Test execution outcomes (pass/fail counts, e.g., "5 passed, 0 failed")
+      - Verification failures encountered and how they were resolved
+      - Remaining TODOs or risks
 
       If agentic components are involved:
       - Implement tool interfaces with least privilege.

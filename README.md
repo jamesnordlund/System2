@@ -2,6 +2,15 @@
 
 A framework for **deliberate, spec-driven, verification-first** software engineering with AI assistance.
 
+## Model Provider Support
+
+System2 supports multiple model providers:
+
+- **Native** (default): Claude Code CLI and Roo Code VS Code extension
+- **AWS Bedrock** (optional): Claude 3.5 Sonnet via AWS Bedrock for enterprise-grade AI
+
+Configure Bedrock in `.system2/config.yml` when you need enterprise features, cost control, or AWS integration.
+
 ## What is System2?
 
 System2 provides a structured multi-agent workflow for building production-grade software. Instead of ad-hoc prompting, it coordinates specialized agents through quality gates:

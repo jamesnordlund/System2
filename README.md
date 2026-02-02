@@ -116,6 +116,10 @@ For simple, focused tasks, you can invoke individual agents directly:
 - Writing tests? → **Test Engineer**
 - Security review? → **Security Sentinel**
 
+### Staying Up to Date
+
+Both platforms include a `/update-system2` slash command that checks for upstream changes, creates a backup, and applies updates. See the platform-specific README for installation and flag details.
+
 ## License
 
 See [LICENSE](LICENSE) for details.

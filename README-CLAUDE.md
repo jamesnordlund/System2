@@ -8,6 +8,8 @@ Claude Code uses **subagents** defined as Markdown files with YAML frontmatter. 
 
 ## Installation
 
+### Step 1: Copy System2 Files
+
 1. Copy this repository (or just the `.claude/` directory) into your project root
 2. Copy `CLAUDE.md` to your project root to enable orchestrator behavior
 3. Copy `scripts/claude-hooks/` for file validation hooks
@@ -16,11 +18,59 @@ Claude Code uses **subagents** defined as Markdown files with YAML frontmatter. 
 your-project/
 ├── .claude/
 │   ├── agents/           # Subagent definitions
-│   └── allowlists/       # File restriction patterns
+│   ├── allowlists/       # File restriction patterns
+│   └── commands/         # Slash commands (including /update-system2)
 ├── scripts/
-│   └── claude-hooks/     # Validation scripts
+│   ├── claude-hooks/     # Validation scripts
+│   ├── update-system2.sh # Update script
+│   └── update-system2-yaml.py  # YAML merge helper (for Roo Code)
 └── CLAUDE.md             # Orchestrator instructions
 ```
+
+### Step 2: Install the Update Command
+
+The `/update-system2` command keeps your agent definitions current when the upstream package changes.
+
+**Project-level** (recommended):
+```bash
+mkdir -p .claude/commands
+curl -sL https://raw.githubusercontent.com/jamesnordlund/System2/main/.claude/commands/update-system2.md \
+  -o .claude/commands/update-system2.md
+curl -sL https://raw.githubusercontent.com/jamesnordlund/System2/main/scripts/update-system2.sh \
+  -o scripts/update-system2.sh
+chmod +x scripts/update-system2.sh
+```
+
+**User-level** (available across all projects):
+```bash
+mkdir -p ~/.claude/commands
+curl -sL https://raw.githubusercontent.com/jamesnordlund/System2/main/.claude/commands/update-system2.md \
+  -o ~/.claude/commands/update-system2.md
+```
+
+**Existing users:** If you already installed System2 manually, just run the commands above to add the update command. It will manage all future updates from that point on.
+
+## Updating
+
+Type `/update-system2` in the Claude Code CLI to check for and apply updates.
+
+Available flags (pass as arguments after the command):
+- `--dry-run` — Show what would change without applying
+- `--scope project|global|both` — Override automatic scope detection
+- `--force` — Skip version check and re-download all files
+- `--repo-url <url>` — Override the upstream GitHub repository URL
+- `--branch <branch>` — Override the upstream branch (default: `main`)
+
+The update process:
+1. Checks the upstream `VERSION` file against your local `.system2-version`
+2. Downloads files listed in the upstream `manifest.json`
+3. Validates downloaded files (YAML, Markdown frontmatter, shell shebangs)
+4. Creates a timestamped backup in `.system2-backup/` before overwriting
+5. Copies validated files into place and writes `.system2-version`
+
+If the update script itself (`scripts/update-system2.sh`) or the slash command was updated, a notice is printed. Changes to the update script take effect on the next invocation.
+
+You can check your installed version by reading the `.system2-version` file in your project root.
 
 ## Available Subagents
 

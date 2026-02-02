@@ -8,6 +8,8 @@ Roo Code uses **custom modes** defined in YAML files. The **Orchestrator** mode 
 
 ## Installation
 
+### Step 1: Import Modes
+
 1. Download [`system2-pack.yml`](roo/system2-pack.yml)
 2. Open Roo Code extension in VS Code
 3. Navigate to **Settings > Modes**
@@ -18,6 +20,58 @@ Roo Code uses **custom modes** defined in YAML files. The **Orchestrator** mode 
 6. Select the downloaded `system2-pack.yml` file
 
 All 14 modes will be imported and ready to use.
+
+### Step 2: Install the Update Command
+
+The `/update-system2` slash command keeps your modes current when the upstream package changes. Since Roo Code mode packs cannot include slash commands, this must be installed separately.
+
+**Project-level** (recommended if System2 is used in one project):
+```bash
+mkdir -p .roo/commands
+curl -sL https://raw.githubusercontent.com/jamesnordlund/System2/main/.roo/commands/update-system2.md \
+  -o .roo/commands/update-system2.md
+curl -sL https://raw.githubusercontent.com/jamesnordlund/System2/main/scripts/update-system2.sh \
+  -o scripts/update-system2.sh
+curl -sL https://raw.githubusercontent.com/jamesnordlund/System2/main/scripts/update-system2-yaml.py \
+  -o scripts/update-system2-yaml.py
+chmod +x scripts/update-system2.sh scripts/update-system2-yaml.py
+```
+
+**Global-level** (if modes were imported globally):
+```bash
+mkdir -p ~/.roo/commands
+curl -sL https://raw.githubusercontent.com/jamesnordlund/System2/main/.roo/commands/update-system2.md \
+  -o ~/.roo/commands/update-system2.md
+```
+
+**Existing users:** If you already imported System2 modes manually, just run the commands above to add the update command. It will manage all future updates from that point on.
+
+> **Note:** The YAML merge requires `python3` and `pyyaml` (`pip3 install pyyaml`).
+
+## Updating
+
+Type `/update-system2` in the Roo Code chat to check for and apply updates.
+
+Available flags (pass as arguments after the command):
+- `--dry-run` — Show what would change without applying
+- `--scope project|global|both` — Override automatic scope detection
+- `--force` — Skip version check and re-download all files
+- `--repo-url <url>` — Override the upstream GitHub repository URL
+- `--branch <branch>` — Override the upstream branch (default: `main`)
+
+The update process:
+1. Checks the upstream `VERSION` file against your local `.system2-version`
+2. Downloads files listed in the upstream `manifest.json`
+3. Validates downloaded files (YAML structure, Markdown frontmatter)
+4. Creates a timestamped backup in `.system2-backup/` before overwriting
+5. For Roo Code, merges incoming System2 modes into your existing config while preserving any non-System2 custom modes
+6. Copies validated files into place and writes `.system2-version`
+
+If the update script itself was updated, a notice is printed. Changes take effect on the next invocation.
+
+After updating, a **VS Code window reload** may be required for mode changes to take effect.
+
+You can check your installed version by reading the `.system2-version` file in your project root.
 
 ## Available Modes
 

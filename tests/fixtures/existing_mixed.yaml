@@ -1,0 +1,33 @@
+customModes:
+- slug: orchestrator
+  name: Orchestrator (System 2)
+  description: Old orchestrator definition
+  roleDefinition: Old role
+  whenToUse: Old when
+  customInstructions: Old instructions
+  groups: []
+- slug: g-spec-coordinator
+  name: Spec Coordinator
+  description: Old spec coordinator
+  roleDefinition: Old role
+  whenToUse: Old when
+  customInstructions: Old instructions
+  groups:
+  - read
+- slug: my-custom-mode
+  name: My Custom Mode
+  description: A user-defined mode that should be preserved
+  roleDefinition: Custom role
+  whenToUse: Use for custom work
+  customInstructions: Custom instructions
+  groups:
+  - read
+  - edit
+- slug: another-custom
+  name: Another Custom
+  description: Another user mode
+  roleDefinition: Another role
+  whenToUse: Use for other work
+  customInstructions: Other instructions
+  groups:
+  - read

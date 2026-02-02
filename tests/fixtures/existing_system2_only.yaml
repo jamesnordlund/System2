@@ -1,0 +1,16 @@
+customModes:
+- slug: orchestrator
+  name: Orchestrator (System 2)
+  description: Old orchestrator
+  roleDefinition: Old role
+  whenToUse: Old when
+  customInstructions: Old instructions
+  groups: []
+- slug: g-spec-coordinator
+  name: Spec Coordinator
+  description: Old spec coordinator
+  roleDefinition: Old role
+  whenToUse: Old when
+  customInstructions: Old instructions
+  groups:
+  - read

@@ -1,0 +1,4 @@
+# Development dependencies for System2
+# Install: uv pip install -r requirements-dev.txt
+pyyaml>=6.0
+pytest>=9.0

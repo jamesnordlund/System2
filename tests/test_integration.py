@@ -300,6 +300,9 @@ class TestValidationFailure:
         roo_pack = mock_upstream / "roo" / "system2-pack.yml"
         roo_pack.write_text("this is not valid yaml: [\nunclosed bracket")
 
+        # Ensure roo platform is detected so the pack file is actually downloaded
+        (project_dir / ".roomodes").write_text("{}")
+
         srv, base_url = start_server(mock_upstream)
         try:
             result = _run_update(project_dir, base_url)

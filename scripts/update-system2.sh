@@ -168,8 +168,14 @@ fetch_file() {
     # Ensure parent directory exists
     mkdir -p "$(dirname "$output")"
 
+    # Enforce HTTPS except for localhost (used in integration tests)
+    local proto_flag=("--proto" "=https")
+    if [[ "$url" == http://localhost* || "$url" == http://127.0.0.1* ]]; then
+        proto_flag=()
+    fi
+
     if ! curl --fail --silent --show-error --max-time "$CURL_TIMEOUT" \
-         --proto '=https' --location -o "$output" "$url"; then
+         ${proto_flag[@]+"${proto_flag[@]}"} --location -o "$output" "$url"; then
         error "Failed to download $description from: $url"
         return 1
     fi

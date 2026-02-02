@@ -37,6 +37,42 @@ CURL_TIMEOUT=30
 LOCK_FILE=""
 TEMP_DIR=""
 
+# ─── Python environment detection ─────────────────────────────────────────
+# Prefer a local .venv if available, so PyYAML can be found/installed there.
+if [[ -x "${INSTALL_ROOT}/.venv/bin/python3" ]]; then
+    export PATH="${INSTALL_ROOT}/.venv/bin:$PATH"
+elif [[ -x "${INSTALL_ROOT}/venv/bin/python3" ]]; then
+    export PATH="${INSTALL_ROOT}/venv/bin:$PATH"
+fi
+
+# Ensure PyYAML is available; auto-install into the venv if possible.
+ensure_pyyaml() {
+    if python3 -c "import yaml" 2>/dev/null; then
+        return 0
+    fi
+
+    # Locate pip alongside the active python3
+    local pip_cmd=""
+    if command -v pip3 &>/dev/null; then
+        pip_cmd="pip3"
+    elif python3 -m pip --version &>/dev/null; then
+        pip_cmd="python3 -m pip"
+    fi
+
+    if [[ -z "$pip_cmd" ]]; then
+        error "PyYAML is required but not installed, and pip is not available."
+        error "Install it manually: pip3 install pyyaml"
+        exit 4
+    fi
+
+    info "PyYAML not found — installing into $(python3 -c 'import sys; print(sys.prefix)')..."
+    if ! $pip_cmd install pyyaml --quiet; then
+        error "Failed to install PyYAML automatically."
+        error "Install it manually: pip3 install pyyaml"
+        exit 4
+    fi
+}
+
 # Global arrays for copy tracking (initialized empty)
 COPY_ADDED=()
 COPY_MODIFIED=()
@@ -674,6 +710,9 @@ main() {
 
     info "System2 Update"
     info "Repository: $REPO_URL (branch: $BRANCH)"
+
+    # Ensure PyYAML is available before doing anything that needs python3
+    ensure_pyyaml
 
     # Acquire lock
     acquire_lock

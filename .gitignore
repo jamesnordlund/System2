@@ -10,6 +10,9 @@ __pycache__/
 
 # IDE / tool settings
 .claude/settings.local.json
+.system2-update.log
+.system2-version
+.system2-backup
 
 # Project
 spec/

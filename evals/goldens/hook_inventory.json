@@ -1,0 +1,20 @@
+{
+  "description": "Expected hook files in hooks/ directory",
+  "version": "0.2.0",
+  "traces": ["REQ-010", "REQ-011"],
+  "python_files": [
+    "_hook_utils.py",
+    "auto-formatter.py",
+    "dangerous-command-blocker.py",
+    "sensitive-file-protector.py",
+    "tts-notify.py",
+    "type-checker.py",
+    "validate-file-paths.py"
+  ],
+  "regex_files": [
+    "dangerous-commands-allowlist.regex",
+    "sensitive-patterns.regex"
+  ],
+  "expected_py_count": 7,
+  "expected_regex_count": 2
+}

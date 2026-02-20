@@ -1,0 +1,20 @@
+{
+  "description": "Agent-to-allowlist binding per design hook pattern taxonomy. Maps each agent that uses validate-file-paths to its expected allowlist regex file.",
+  "version": "0.2.0",
+  "traces": ["REQ-017"],
+  "bindings": {
+    "spec-coordinator": "spec-context.regex",
+    "requirements-engineer": "spec-requirements.regex",
+    "design-architect": "spec-design.regex",
+    "task-planner": "spec-tasks.regex",
+    "docs-release": "docs-release.regex",
+    "postmortem-scribe": "postmortems.regex",
+    "executor": "executor.regex",
+    "test-engineer": "test-engineer.regex",
+    "eval-engineer": "spec-evals.regex",
+    "mcp-toolsmith": "mcp.regex",
+    "repo-governor": "repo-governor.regex",
+    "security-sentinel": "spec-security.regex"
+  },
+  "agents_without_allowlist": ["code-reviewer"]
+}

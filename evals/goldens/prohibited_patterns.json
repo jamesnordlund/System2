@@ -1,0 +1,92 @@
+{
+  "description": "Patterns that must NOT appear in specified file scopes",
+  "version": "0.2.0",
+  "traces": ["REQ-018", "REQ-019", "REQ-025", "REQ-045", "REQ-046", "REQ-047", "REQ-073"],
+  "rules": [
+    {
+      "id": "no-claude-project-dir-in-agents",
+      "pattern": "CLAUDE_PROJECT_DIR",
+      "scope": "plugin/agents/",
+      "description": "No CLAUDE_PROJECT_DIR references in agent frontmatter",
+      "traces": ["REQ-018", "REQ-046"]
+    },
+    {
+      "id": "no-dotclaude-hooks-in-agents",
+      "pattern": "\\.claude/(hooks|allowlists)",
+      "scope": "plugin/agents/",
+      "description": "No .claude/hooks/ or .claude/allowlists/ paths in agent files",
+      "traces": ["REQ-019", "REQ-047"]
+    },
+    {
+      "id": "no-dotclaude-agents-path-in-claudemd",
+      "pattern": "\\.claude/agents/",
+      "scope": "CLAUDE.md",
+      "description": "No .claude/agents/ filesystem path in CLAUDE.md",
+      "traces": ["REQ-025"]
+    },
+    {
+      "id": "no-dotclaude-agents-path-in-template",
+      "pattern": "\\.claude/agents/",
+      "scope": "plugin/skills/init/SKILL.md",
+      "description": "No .claude/agents/ filesystem path in init template",
+      "traces": ["REQ-025"]
+    },
+    {
+      "id": "no-system2-in-gitignore",
+      "pattern": "\\.system2/",
+      "scope": ".gitignore",
+      "description": "No stale .system2/ entries in .gitignore",
+      "traces": ["REQ-045"]
+    },
+    {
+      "id": "no-req-ids-in-agents",
+      "pattern": "REQ-[0-9]{3}",
+      "scope": "plugin/agents/",
+      "description": "No requirement IDs in agent files (except requirements-engineer.md instructional example)",
+      "exclude_files": ["plugin/agents/requirements-engineer.md"],
+      "traces": ["REQ-073"]
+    },
+    {
+      "id": "no-req-ids-in-commands",
+      "pattern": "REQ-[0-9]{3}",
+      "scope": "plugin/skills/",
+      "description": "No requirement IDs in skill files",
+      "traces": ["REQ-073"]
+    },
+    {
+      "id": "no-req-ids-in-hooks",
+      "pattern": "REQ-[0-9]{3}",
+      "scope": "plugin/hooks/",
+      "description": "No requirement IDs in hook files",
+      "traces": ["REQ-073"]
+    },
+    {
+      "id": "no-req-ids-in-allowlists",
+      "pattern": "REQ-[0-9]{3}",
+      "scope": "plugin/allowlists/",
+      "description": "No requirement IDs in allowlist files",
+      "traces": ["REQ-073"]
+    },
+    {
+      "id": "no-req-ids-in-plugin-manifests",
+      "pattern": "REQ-[0-9]{3}",
+      "scope": "plugin/.claude-plugin/",
+      "description": "No requirement IDs in plugin manifest files",
+      "traces": ["REQ-073"]
+    },
+    {
+      "id": "no-req-ids-in-readme",
+      "pattern": "REQ-[0-9]{3}",
+      "scope": "README.md",
+      "description": "No requirement IDs in README",
+      "traces": ["REQ-073"]
+    },
+    {
+      "id": "no-req-ids-in-claudemd",
+      "pattern": "REQ-[0-9]{3}",
+      "scope": "CLAUDE.md",
+      "description": "No requirement IDs in CLAUDE.md",
+      "traces": ["REQ-073"]
+    }
+  ]
+}

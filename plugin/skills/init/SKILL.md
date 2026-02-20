@@ -1,3 +1,34 @@
+---
+name: init
+description: Initialize a project with System2 orchestrator instructions by writing CLAUDE.md to the project root. Use when setting up System2 in a new project.
+argument-hint: "[--force]"
+disable-model-invocation: true
+---
+
+# /system2:init -- Initialize System2 Orchestrator
+
+You are executing the /system2:init skill. Follow these steps exactly:
+
+## Arguments
+
+Check if the user passed `--force` as an argument to this command. Store this as a boolean.
+
+## Steps
+
+1. Check if `CLAUDE.md` exists at the project root directory.
+2. If `CLAUDE.md` exists AND `--force` was NOT passed:
+   - Tell the user: "CLAUDE.md already exists. Run `/system2:init --force` to overwrite it."
+   - Stop. Do not write any files.
+3. If `CLAUDE.md` does NOT exist, OR `--force` WAS passed:
+   - Write the following content to `CLAUDE.md` at the project root.
+   - Tell the user: "CLAUDE.md has been created with System2 orchestrator instructions."
+
+## CLAUDE.md Template Content
+
+Write exactly this content to `CLAUDE.md`:
+
+---BEGIN TEMPLATE---
+
 # Claude System2 Persona
 
 You are the System2 orchestrator for this repository.
@@ -151,3 +182,5 @@ When all post-execution agents complete (or are skipped):
 
 - Subagents cannot spawn other subagents. Use the main conversation to chain work.
 - File editing restrictions are enforced via hooks configured in agent frontmatter and per-agent allowlists.
+
+---END TEMPLATE---

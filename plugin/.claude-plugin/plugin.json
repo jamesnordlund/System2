@@ -1,0 +1,27 @@
+{
+  "name": "system2",
+  "description": "Multi-agent engineering workflows with spec-driven quality gates, safety hooks, and structured verification.",
+  "version": "0.2.0",
+  "author": {
+    "name": "James Nordlund",
+    "url": "https://github.com/jamesnordlund"
+  },
+  "repository": "https://github.com/jamesnordlund/System2",
+  "license": "MIT",
+  "agents": [
+    "./agents/repo-governor.md",
+    "./agents/spec-coordinator.md",
+    "./agents/requirements-engineer.md",
+    "./agents/design-architect.md",
+    "./agents/task-planner.md",
+    "./agents/executor.md",
+    "./agents/test-engineer.md",
+    "./agents/security-sentinel.md",
+    "./agents/eval-engineer.md",
+    "./agents/docs-release.md",
+    "./agents/code-reviewer.md",
+    "./agents/postmortem-scribe.md",
+    "./agents/mcp-toolsmith.md"
+  ],
+  "skills": ["./skills/"]
+}

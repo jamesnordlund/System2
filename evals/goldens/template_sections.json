@@ -1,0 +1,16 @@
+{
+  "description": "Required section headings in the CLAUDE.md template (skills/init/SKILL.md)",
+  "version": "0.2.0",
+  "traces": ["REQ-026"],
+  "required_headings": [
+    "Operating principles",
+    "Session Bootstrap",
+    "Delegation map",
+    "Gate checklist",
+    "Delegation contract",
+    "Post-Execution Workflow",
+    "Blocker Handling",
+    "Gate 5 Summary Aggregation",
+    "Safety"
+  ]
+}

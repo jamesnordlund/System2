@@ -1,0 +1,20 @@
+{
+  "description": "Agent names referenced in CLAUDE.md delegation map. Must match agent filenames in agents/.",
+  "version": "0.2.0",
+  "traces": ["REQ-008"],
+  "delegation_order": [
+    "repo-governor",
+    "spec-coordinator",
+    "requirements-engineer",
+    "design-architect",
+    "task-planner",
+    "executor",
+    "test-engineer",
+    "security-sentinel",
+    "eval-engineer",
+    "docs-release",
+    "code-reviewer",
+    "postmortem-scribe",
+    "mcp-toolsmith"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "description": "Expected field values for plugin.json and marketplace.json",
+  "version": "0.2.0",
+  "traces": ["REQ-001", "REQ-002", "REQ-003", "REQ-004", "REQ-005", "REQ-006", "REQ-007"],
+  "plugin_json": {
+    "path": "plugin/.claude-plugin/plugin.json",
+    "required_fields": {
+      "name": "system2",
+      "version": "0.2.0",
+      "author.name": "James Nordlund"
+    },
+    "required_field_names": ["name", "description", "version", "author"]
+  },
+  "marketplace_json": {
+    "path": ".claude-plugin/marketplace.json",
+    "required_fields": {
+      "owner": {"name": "James Nordlund", "url": "https://github.com/jamesnordlund"}
+    },
+    "required_field_names": ["name", "owner", "plugins"],
+    "plugins_first_entry": {
+      "source": "./plugin"
+    }
+  },
+  "version_file": {
+    "path": "VERSION",
+    "expected_content": "0.2.0"
+  }
+}

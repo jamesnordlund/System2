@@ -1,0 +1,25 @@
+{
+  "name": "system2-marketplace",
+  "owner": {
+    "name": "James Nordlund",
+    "url": "https://github.com/jamesnordlund"
+  },
+  "metadata": {
+    "description": "Multi-agent engineering workflows with spec-driven quality gates for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "system2",
+      "source": "./plugin",
+      "description": "Multi-agent engineering workflows with spec-driven quality gates, safety hooks, and structured verification.",
+      "author": {
+        "name": "James Nordlund"
+      },
+      "homepage": "https://github.com/jamesnordlund/System2",
+      "repository": "https://github.com/jamesnordlund/System2",
+      "license": "MIT",
+      "keywords": ["agents", "skills", "hooks", "workflow", "spec-driven", "quality-gates", "multi-agent"],
+      "category": "workflow"
+    }
+  ]
+}

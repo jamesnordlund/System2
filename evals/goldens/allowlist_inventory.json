@@ -1,0 +1,20 @@
+{
+  "description": "Expected allowlist files in allowlists/ directory",
+  "version": "0.2.0",
+  "traces": ["REQ-014"],
+  "files": [
+    "docs-release.regex",
+    "executor.regex",
+    "mcp.regex",
+    "postmortems.regex",
+    "repo-governor.regex",
+    "spec-context.regex",
+    "spec-design.regex",
+    "spec-evals.regex",
+    "spec-requirements.regex",
+    "spec-security.regex",
+    "spec-tasks.regex",
+    "test-engineer.regex"
+  ],
+  "expected_count": 12
+}

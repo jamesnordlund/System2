@@ -1,0 +1,21 @@
+{
+  "description": "Expected agent files in agents/ directory with their frontmatter name fields",
+  "version": "0.2.0",
+  "traces": ["REQ-008"],
+  "agents": {
+    "repo-governor.md": "repo-governor",
+    "spec-coordinator.md": "spec-coordinator",
+    "requirements-engineer.md": "requirements-engineer",
+    "design-architect.md": "design-architect",
+    "task-planner.md": "task-planner",
+    "executor.md": "executor",
+    "test-engineer.md": "test-engineer",
+    "security-sentinel.md": "security-sentinel",
+    "eval-engineer.md": "eval-engineer",
+    "docs-release.md": "docs-release",
+    "code-reviewer.md": "code-reviewer",
+    "postmortem-scribe.md": "postmortem-scribe",
+    "mcp-toolsmith.md": "mcp-toolsmith"
+  },
+  "expected_count": 13
+}

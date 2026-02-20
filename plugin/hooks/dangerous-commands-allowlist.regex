@@ -1,0 +1,50 @@
+# Dangerous Command Blocker - Allowlist File
+# ============================================
+#
+# This file contains regex patterns for commands that should be ALLOWED
+# even if they match the built-in dangerous command patterns.
+#
+# FORMAT:
+# - One regex pattern per line
+# - Lines starting with # are comments
+# - Empty lines are ignored
+# - Patterns are combined with OR (any match = allow)
+# - Patterns are matched against the FULL command string
+# - Use ^ and $ anchors for exact matches
+#
+# USAGE:
+# Pass this file as an argument to the dangerous-command-blocker.py hook:
+#   python3 "${CLAUDE_PLUGIN_ROOT}/hooks/dangerous-command-blocker.py" "${CLAUDE_PLUGIN_ROOT}/hooks/dangerous-commands-allowlist.regex"
+#
+# WARNING:
+# Adding patterns to this allowlist bypasses safety checks. Only add
+# patterns for commands you fully understand and trust.
+#
+# EXAMPLES (uncomment and modify as needed):
+# ------------------------------------------
+
+# Allow force push to hotfix branches (use with caution)
+# ^git push --force origin hotfix-.*$
+# ^git push -f origin hotfix-.*$
+
+# Allow rm -rf on specific safe directories
+# ^rm -rf \./node_modules$
+# ^rm -rf \./dist$
+# ^rm -rf \./build$
+# ^rm -rf \./__pycache__$
+# ^rm -rf \./\.pytest_cache$
+
+# Allow git reset --hard with specific refs (use with caution)
+# ^git reset --hard HEAD$
+# ^git reset --hard origin/main$
+
+# Allow DROP TABLE in test/development databases
+# ^.*DROP TABLE IF EXISTS test_.*$
+# ^.*DROP TABLE IF EXISTS dev_.*$
+
+# Allow DELETE without WHERE for specific test tables
+# ^.*DELETE FROM test_.*$
+# ^.*DELETE FROM temp_.*$
+
+# Allow chmod 777 on specific temp directories (not recommended)
+# ^chmod 777 /tmp/my-app-cache$

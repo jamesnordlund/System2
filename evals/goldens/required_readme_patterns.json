@@ -1,0 +1,59 @@
+{
+  "description": "Patterns that must appear in README.md and patterns that must NOT appear",
+  "version": "0.2.0",
+  "traces": ["REQ-036", "REQ-037", "REQ-038", "REQ-039", "REQ-040", "REQ-041"],
+  "must_contain": [
+    {
+      "id": "readme-marketplace-add",
+      "pattern": "plugin marketplace add jamesnordlund/System2",
+      "description": "Plugin marketplace add command",
+      "traces": ["REQ-036"]
+    },
+    {
+      "id": "readme-plugin-install",
+      "pattern": "plugin install system2@jamesnordlund-system2",
+      "description": "Plugin install command",
+      "traces": ["REQ-036"]
+    },
+    {
+      "id": "readme-init-command",
+      "pattern": "system2:init",
+      "description": "Init slash command reference",
+      "traces": ["REQ-037"]
+    },
+    {
+      "id": "readme-force-flag",
+      "pattern": "--force",
+      "description": "Force flag documentation",
+      "traces": ["REQ-037"]
+    },
+    {
+      "id": "readme-migration",
+      "pattern": "[Mm]igrat",
+      "is_regex": true,
+      "description": "Migration section present",
+      "traces": ["REQ-040"]
+    }
+  ],
+  "must_not_contain": [
+    {
+      "id": "readme-no-curl",
+      "pattern": "curl ",
+      "description": "No curl commands in README",
+      "traces": ["REQ-038"]
+    },
+    {
+      "id": "readme-no-update-system2",
+      "pattern": "/update-system2",
+      "description": "No /update-system2 command references",
+      "traces": ["REQ-038"]
+    },
+    {
+      "id": "readme-no-old-hook-paths",
+      "pattern": "CLAUDE_PROJECT_DIR.*\\.claude/hooks",
+      "is_regex": true,
+      "description": "No old-style hook path references",
+      "traces": ["REQ-041"]
+    }
+  ]
+}

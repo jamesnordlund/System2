@@ -18,6 +18,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Codex runtime docs in `codex/README.md`.
 - Codex-specific eval harness and golden schemas in `evals/run_codex_evals.py` and `evals/goldens/codex_*.json`.
 - Migration guide for Claude-only to dual runtime adoption in `docs/MIGRATION_CLAUDE_TO_DUAL_RUNTIME.md`.
+- Dual-runtime execution mode feature design in `docs/DUAL_RUNTIME_EXECUTION_MODES.md`.
 
 ### Changed
 

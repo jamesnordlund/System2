@@ -177,6 +177,12 @@ For teams that already run System2 on Claude and want to add Codex in parallel, 
 
 - [docs/MIGRATION_CLAUDE_TO_DUAL_RUNTIME.md](docs/MIGRATION_CLAUDE_TO_DUAL_RUNTIME.md)
 
+## Dual-Runtime Execution Modes
+
+Feature design for token-window-aware cross-runtime scheduling and post-design mirror adjudication:
+
+- [docs/DUAL_RUNTIME_EXECUTION_MODES.md](docs/DUAL_RUNTIME_EXECUTION_MODES.md)
+
 ## Usage
 
 ### Basic Workflow

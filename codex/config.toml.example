@@ -1,0 +1,10 @@
+# Example Codex config for System2 workflows.
+# Merge into ~/.codex/config.toml as needed.
+
+[features]
+multi_agent = true
+shell_snapshot = true
+apps = true
+
+[profiles.system2]
+model_reasoning_effort = "high"

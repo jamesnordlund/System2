@@ -1,0 +1,26 @@
+{
+  "description": "Patterns that must appear in README.md for Codex runtime support",
+  "version": "0.2.0",
+  "must_contain": [
+    {
+      "id": "readme-codex-install-heading",
+      "pattern": "Codex Installation (Marketplace Alternative)",
+      "description": "Codex installation section heading"
+    },
+    {
+      "id": "readme-codex-install-command",
+      "pattern": "./codex/install.sh",
+      "description": "Codex installer command"
+    },
+    {
+      "id": "readme-codex-multi-agent",
+      "pattern": "codex features enable multi_agent",
+      "description": "Codex multi-agent enable command"
+    },
+    {
+      "id": "readme-codex-init-skill",
+      "pattern": "system2-init",
+      "description": "Codex init skill reference"
+    }
+  ]
+}

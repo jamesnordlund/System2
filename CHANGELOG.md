@@ -5,6 +5,26 @@ All notable changes to System2 are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Codex runtime pack under `codex/`:
+  - `codex/templates/AGENTS.md` orchestrator template.
+  - `codex/skills/init/SKILL.md` (`system2-init`) to bootstrap `AGENTS.md`.
+  - `codex/runtime/agent-registry.json` mapping System2 roles to Codex sub-agent types.
+  - `codex/tools/validate_paths.py` for allowlist-backed write validation.
+  - `codex/install.sh` installer as the Codex alternative to Claude marketplace/plugin install.
+- Codex runtime docs in `codex/README.md`.
+- Codex-specific eval harness and golden schemas in `evals/run_codex_evals.py` and `evals/goldens/codex_*.json`.
+- Migration guide for Claude-only to dual runtime adoption in `docs/MIGRATION_CLAUDE_TO_DUAL_RUNTIME.md`.
+- Dual-runtime execution mode feature design in `docs/DUAL_RUNTIME_EXECUTION_MODES.md`.
+
+### Changed
+
+- `README.md` now documents dual runtime support (Claude Code + Codex) and Codex installation/update flow.
+- `codex/install.sh` now enables `multi_agent` during install.
+
 ## [0.2.0] - 2026-02-16
 
 Remove Roo Code support and convert to Claude Code plugin with marketplace distribution.

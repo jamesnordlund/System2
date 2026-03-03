@@ -1,0 +1,17 @@
+{
+  "description": "Expected schema for codex/manifest.json",
+  "version": "0.2.0",
+  "manifest_path": "codex/manifest.json",
+  "required_fields": {
+    "name": "system2-codex",
+    "runtime": "codex",
+    "version": "0.2.0"
+  },
+  "required_entrypoints": [
+    "init_skill",
+    "orchestrator_template",
+    "agent_registry",
+    "path_validator",
+    "installer"
+  ]
+}

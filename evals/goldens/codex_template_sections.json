@@ -1,0 +1,15 @@
+{
+  "description": "Required section headings in codex/templates/AGENTS.md",
+  "version": "0.2.0",
+  "required_headings": [
+    "# Codex System2 Persona",
+    "## Operating principles",
+    "## Session Bootstrap",
+    "## Delegation map (preferred order)",
+    "## Codex runtime notes",
+    "## Gate checklist",
+    "## Delegation contract",
+    "## Post-Execution Workflow",
+    "## Safety"
+  ]
+}

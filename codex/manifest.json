@@ -1,0 +1,21 @@
+{
+  "name": "system2-codex",
+  "version": "0.2.0",
+  "description": "Codex runtime pack for System2 spec-driven multi-agent workflows.",
+  "repository": "https://github.com/jamesnordlund/System2",
+  "license": "MIT",
+  "runtime": "codex",
+  "entrypoints": {
+    "init_skill": "./skills/init/SKILL.md",
+    "orchestrator_template": "./templates/AGENTS.md",
+    "agent_registry": "./runtime/agent-registry.json",
+    "path_validator": "./tools/validate_paths.py",
+    "installer": "./install.sh",
+    "config_example": "./config.toml.example"
+  },
+  "install": {
+    "target_skill_dir": "$CODEX_HOME/skills/system2",
+    "supports_dry_run": true,
+    "idempotent": true
+  }
+}

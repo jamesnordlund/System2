@@ -1,0 +1,83 @@
+{
+  "description": "System2 role mapping for Codex runtime. Uses Claude plugin agent prompts as source-of-truth role definitions with Codex execution metadata.",
+  "version": "0.2.0",
+  "agents": [
+    {
+      "name": "repo-governor",
+      "codex_agent_type": "explorer",
+      "source_prompt": "plugin/agents/repo-governor.md",
+      "write_allowlist": "plugin/allowlists/repo-governor.regex"
+    },
+    {
+      "name": "spec-coordinator",
+      "codex_agent_type": "default",
+      "source_prompt": "plugin/agents/spec-coordinator.md",
+      "write_allowlist": "plugin/allowlists/spec-context.regex"
+    },
+    {
+      "name": "requirements-engineer",
+      "codex_agent_type": "default",
+      "source_prompt": "plugin/agents/requirements-engineer.md",
+      "write_allowlist": "plugin/allowlists/spec-requirements.regex"
+    },
+    {
+      "name": "design-architect",
+      "codex_agent_type": "default",
+      "source_prompt": "plugin/agents/design-architect.md",
+      "write_allowlist": "plugin/allowlists/spec-design.regex"
+    },
+    {
+      "name": "task-planner",
+      "codex_agent_type": "default",
+      "source_prompt": "plugin/agents/task-planner.md",
+      "write_allowlist": "plugin/allowlists/spec-tasks.regex"
+    },
+    {
+      "name": "executor",
+      "codex_agent_type": "worker",
+      "source_prompt": "plugin/agents/executor.md",
+      "write_allowlist": "plugin/allowlists/executor.regex"
+    },
+    {
+      "name": "test-engineer",
+      "codex_agent_type": "worker",
+      "source_prompt": "plugin/agents/test-engineer.md",
+      "write_allowlist": "plugin/allowlists/test-engineer.regex"
+    },
+    {
+      "name": "security-sentinel",
+      "codex_agent_type": "explorer",
+      "source_prompt": "plugin/agents/security-sentinel.md",
+      "write_allowlist": "plugin/allowlists/spec-security.regex"
+    },
+    {
+      "name": "eval-engineer",
+      "codex_agent_type": "worker",
+      "source_prompt": "plugin/agents/eval-engineer.md",
+      "write_allowlist": "plugin/allowlists/spec-evals.regex"
+    },
+    {
+      "name": "docs-release",
+      "codex_agent_type": "worker",
+      "source_prompt": "plugin/agents/docs-release.md",
+      "write_allowlist": "plugin/allowlists/docs-release.regex"
+    },
+    {
+      "name": "code-reviewer",
+      "codex_agent_type": "explorer",
+      "source_prompt": "plugin/agents/code-reviewer.md"
+    },
+    {
+      "name": "postmortem-scribe",
+      "codex_agent_type": "default",
+      "source_prompt": "plugin/agents/postmortem-scribe.md",
+      "write_allowlist": "plugin/allowlists/postmortems.regex"
+    },
+    {
+      "name": "mcp-toolsmith",
+      "codex_agent_type": "worker",
+      "source_prompt": "plugin/agents/mcp-toolsmith.md",
+      "write_allowlist": "plugin/allowlists/mcp.regex"
+    }
+  ]
+}

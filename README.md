@@ -1,6 +1,6 @@
 # System2 - Multi-Agent Engineering Workflows
 
-A framework for **deliberate, spec-driven, verification-first** software engineering with AI assistance.
+A framework for **deliberate, spec-driven, verification-first** software engineering with AI assistance across Claude Code and Codex runtimes.
 
 ## What is System2?
 
@@ -13,6 +13,8 @@ Scope → Context → Requirements → Design → Tasks → Implementation → V
 The name comes from Daniel Kahneman's dual-process theory: **System 1** is fast and intuitive; **System 2** is slow and deliberate. This framework embodies System 2 thinking—analytical, verification-focused, and risk-aware.
 
 Claude Code uses **subagents** defined as Markdown files with YAML frontmatter. The main conversation acts as the **orchestrator**, delegating specialist work to purpose-built subagents.
+
+Codex uses **spawned sub-agents** coordinated by `AGENTS.md` instructions plus a System2 runtime pack (`codex/`) that provides initialization and policy tooling.
 
 ## Core Concepts
 
@@ -62,6 +64,15 @@ These artifacts serve as the contract between planning and execution.
 
 ## Installation
 
+### Supported Runtimes
+
+- **Claude Code runtime**: plugin + marketplace distribution (`.claude-plugin/`, `plugin/`)
+- **Codex runtime**: local runtime pack installer (`codex/install.sh`) and `system2-init` skill
+
+Choose the installation flow for your runtime.
+
+### Claude Code Installation
+
 ### Step 1: Add the System2 Marketplace
 
 ```
@@ -101,9 +112,43 @@ To overwrite an existing CLAUDE.md:
 /system2:init --force
 ```
 
+### Codex Installation (Marketplace Alternative)
+
+Codex does not use Claude plugin marketplace manifests. The System2 equivalent is a local runtime pack installer.
+
+### Step 1: Install the Codex Runtime Pack
+
+```bash
+./codex/install.sh
+```
+
+Dry run:
+
+```bash
+./codex/install.sh --dry-run
+```
+
+### Step 2: Multi-Agent Runtime Configuration
+
+```bash
+codex features enable multi_agent
+```
+
+`./codex/install.sh` runs this automatically as part of installation.
+
+Optional: merge settings from `codex/config.toml.example` into `~/.codex/config.toml`.
+
+### Step 3: Initialize AGENTS.md
+
+In your project session, ask Codex to run the `system2-init` skill.
+This writes the System2 orchestrator instructions to `AGENTS.md` in your project root.
+
+To overwrite an existing file, run with `--force`.
+
 ## Updating
 
-System2 updates are handled by the Claude Code plugin system. No manual update commands are needed.
+For Claude Code, updates are handled by the plugin system.  
+For Codex, re-run `./codex/install.sh` to refresh the installed runtime pack.
 
 To check plugin status:
 
@@ -126,11 +171,17 @@ If you previously installed System2 by copying files manually, remove the old fi
 
 After cleanup, follow the Installation steps above.
 
+## Migrating from Claude-Only to Dual Runtime
+
+For teams that already run System2 on Claude and want to add Codex in parallel, use the migration guide:
+
+- [docs/MIGRATION_CLAUDE_TO_DUAL_RUNTIME.md](docs/MIGRATION_CLAUDE_TO_DUAL_RUNTIME.md)
+
 ## Usage
 
 ### Basic Workflow
 
-With `CLAUDE.md` in place, Claude Code acts as the orchestrator. At session start, it assesses the spec artifact state:
+With `CLAUDE.md` (Claude) or `AGENTS.md` (Codex) in place, the orchestrator assesses the spec artifact state at session start:
 
 ```
 You: Build a user authentication system

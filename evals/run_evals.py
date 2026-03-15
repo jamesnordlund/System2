@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-System2 v0.2.0 Plugin Migration Eval Harness
+System2 v0.3.0 Maintenance Loop Eval Harness
 
 Deterministic structural assertions verifying the plugin conversion.
 Uses only Python 3.8+ standard library. No external dependencies.
@@ -771,6 +771,40 @@ def eval_sec_003():
     )
 
 
+def eval_sec_004():
+    """EVAL-SEC-004: All allowlist .regex files contain valid regex"""
+    errors = []
+    allowlist_dir = REPO_ROOT / PLUGIN_DIR / "allowlists"
+    if allowlist_dir.is_dir():
+        for fpath in sorted(allowlist_dir.glob("*.regex")):
+            content = fpath.read_text(encoding="utf-8", errors="replace").strip()
+            if not content:
+                errors.append(f"{fpath.name}: empty file")
+                continue
+            # Combine non-comment, non-blank lines with | (same logic as validate-file-paths.py)
+            lines = [
+                line.strip()
+                for line in content.splitlines()
+                if line.strip() and not line.strip().startswith("#")
+            ]
+            if not lines:
+                errors.append(f"{fpath.name}: no active patterns")
+                continue
+            combined = "|".join(lines)
+            try:
+                re.compile(combined)
+            except re.error as e:
+                errors.append(f"{fpath.name}: invalid regex: {e}")
+    else:
+        errors.append(f"{PLUGIN_DIR}/allowlists/ directory not found")
+    record(
+        "EVAL-SEC-004",
+        "All allowlist .regex files contain valid regex",
+        len(errors) == 0,
+        "; ".join(errors) if errors else "",
+    )
+
+
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -811,6 +845,7 @@ ALL_EVALS = [
     eval_sec_001,
     eval_sec_002,
     eval_sec_003,
+    eval_sec_004,
 ]
 
 
@@ -818,7 +853,7 @@ def main():
     start = time.time()
 
     print("=" * 70)
-    print("System2 v0.2.0 Plugin Migration Eval Suite")
+    print("System2 v0.3.0 Maintenance Loop Eval Suite")
     print(f"Repo root: {REPO_ROOT}")
     print(f"Goldens:   {GOLDENS_DIR}")
     print("=" * 70)

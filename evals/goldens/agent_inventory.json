@@ -1,6 +1,6 @@
 {
   "description": "Expected agent files in agents/ directory with their frontmatter name fields",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "traces": ["REQ-008"],
   "agents": {
     "repo-governor.md": "repo-governor",

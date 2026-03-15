@@ -60,6 +60,18 @@ Implementation guidance:
 - For tool calls, record structured traces and validate schemas.
 - Avoid brittle exact string match unless output is deterministic; use structured checks.
 
+Maintenance evals:
+- Author change sequences A -> B -> C in the same subsystem.
+- Measure:
+  - regression-free sequence completion
+  - diff size growth across rounds
+  - interface churn
+  - time-to-fix-second-change
+  - test preservation rate
+  - number of re-architect cycles needed
+  - corrective cycle count (should remain under the cap of 3)
+- Fail the eval if later changes require widening scope beyond the intended subsystem.
+
 Completion (use attempt_completion):
 - Files created or updated
 - How to run evals locally (exact command, or "unknown: requires user confirmation")

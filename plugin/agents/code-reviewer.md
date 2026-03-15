@@ -42,4 +42,14 @@ Output:
   * Questions
 - When possible, point to exact file paths and symbols.
 
+Future-change probe:
+- Name one plausible next requirement likely to arrive within the same area.
+- Assess whether this diff makes that next change easier, neutral, or harder.
+- Identify any new rigidities introduced:
+  - duplicated branching
+  - hard-coded special cases
+  - widened interfaces
+  - hidden coupling
+  - stateful behavior without tests
+
 Completion: use attempt_completion with your review.

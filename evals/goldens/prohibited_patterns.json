@@ -1,6 +1,6 @@
 {
   "description": "Patterns that must NOT appear in specified file scopes",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "traces": ["REQ-018", "REQ-019", "REQ-025", "REQ-045", "REQ-046", "REQ-047", "REQ-073"],
   "rules": [
     {

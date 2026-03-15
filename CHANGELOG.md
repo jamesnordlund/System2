@@ -5,6 +5,30 @@ All notable changes to System2 are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-03-15
+
+Add a bounded corrective path for non-local regressions while preserving the existing fast path for routine implementation.
+
+### Added
+
+- Maintenance / Regression Loop in `CLAUDE.md` with local-vs-non-local failure classification, regression ledger recording, amendment-vs-invalidation routing, and a 3-cycle corrective iteration cap.
+- Corrective mode for `requirements-engineer` — bimodal operation (baseline for initial spec work, corrective for post-verification failure analysis) producing bounded requirement deltas with design-impact classification.
+- Maintenance execution rules and citation authority for `executor` — scope discipline during corrective cycles, with temporary REQ ID citation from corrective packets.
+- Structured verification summary for `test-engineer` — baseline/regressed/flaky/changed-file breakdown required in completion output, plus a test mutation policy with edit classification and assertion-weakening guards.
+- Future-change probe for `code-reviewer` — assesses whether each diff makes plausible next changes easier, neutral, or harder, and identifies new rigidities.
+- Maintenance evals for `eval-engineer` — sequential change-sequence authoring with metrics for regression-free completion, diff size growth, interface churn, and corrective cycle count.
+- `spec/regression-ledger.md` as a formal artifact with `allowlists/regression-ledger.regex` and tracked in `agent_allowlist_bindings.json` as an unbound allowlist.
+- `spec/regression-ledger.md` listed in `design-architect` inputs for context when refreshing design after corrective requirements.
+- `EVAL-SEC-004` — validates all allowlist `.regex` files contain compilable regex patterns.
+- `Maintenance / Regression Loop` added to `template_sections.json` required headings.
+
+### Changed
+
+- `requirements-engineer` description and inputs updated to reflect bimodal operation.
+- `test-engineer` completion summary now requires the structured verification summary.
+- `allowlist_inventory.json` expected count updated from 12 to 13.
+- `skills/init/SKILL.md` template synced with updated `CLAUDE.md`.
+
 ## [0.2.0] - 2026-02-16
 
 Remove Roo Code support and convert to Claude Code plugin with marketplace distribution.

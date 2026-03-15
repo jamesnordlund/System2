@@ -48,6 +48,7 @@ Assumptions/Risks: [What could go wrong; what is assumed true]
 Inputs:
 - spec/context.md (required)
 - spec/requirements.md (required)
+- spec/regression-ledger.md (context when refreshing design after corrective requirements)
 - CLAUDE.md (project instructions) and .claude/settings.json (if present)
 - .claude/rules/*.md for any modular rule files
 - Relevant existing code and interfaces (read only what you need)

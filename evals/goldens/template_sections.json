@@ -1,6 +1,6 @@
 {
   "description": "Required section headings in the CLAUDE.md template (skills/init/SKILL.md)",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "traces": ["REQ-026"],
   "required_headings": [
     "Operating principles",
@@ -11,6 +11,7 @@
     "Post-Execution Workflow",
     "Blocker Handling",
     "Gate 5 Summary Aggregation",
-    "Safety"
+    "Safety",
+    "Maintenance / Regression Loop"
   ]
 }

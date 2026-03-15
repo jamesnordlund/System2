@@ -101,6 +101,18 @@ Completion summary (use attempt_completion):
 - Verification failures encountered and how they were resolved
 - Remaining TODOs or risks
 
+Maintenance execution rules:
+- Treat the approved task list or corrective requirement packet as the contract.
+- Do not expand scope to solve adjacent failures unless the contract explicitly includes them.
+- Continue normal local self-correction for routine implementation failures (regressions confined to files you are actively editing).
+- If you observe regressions in files you have not modified, cross-module side effects, or you exhaust the self-correction limit, stop and request corrective requirements.
+- If the fix appears to require interface redesign, stop and request updated design.
+- Prefer localized edits to stable interfaces over call-site proliferation.
+
+Citation authority during corrective execution:
+- When implementing fixes from a corrective requirement packet, the packet's requirement IDs serve as valid citation authority for test updates until spec/requirements.md is formally refreshed.
+- Once spec/requirements.md is updated, all subsequent citations must reference the canonical requirement IDs.
+
 If agentic components are involved:
 - Implement tool interfaces with least privilege.
 - Add explicit input sanitization and strict schema validation for tool inputs/outputs.

@@ -52,20 +52,31 @@ Deliverables (repo root unless conventions say otherwise):
    - Note: Optionally create/sync AGENTS.md for cross-IDE compatibility (Cursor, Codex, Zed).
 2) .claude/settings.json (if missing or incomplete)
    - Configure `permissions.deny` patterns to exclude secrets and large artifacts from Claude Code access.
+   - IMPORTANT: Each deny entry must be prefixed with the tool name and use parenthesized path syntax: `Read(pattern)` or `Edit(pattern)`. Bare glob patterns are invalid and will be silently ignored or produce warnings.
+   - Deny both `Read` and `Edit` for each sensitive path pattern.
    - Example structure:
      ```json
      {
        "permissions": {
          "deny": [
-           ".env",
-           ".env.*",
-           "**/*.pem",
-           "**/*.key",
-           "**/credentials.json",
-           "**/secrets/**",
-           "node_modules/**",
-           "dist/**",
-           "build/**"
+           "Read(.env)",
+           "Read(.env.*)",
+           "Read(**/*.pem)",
+           "Read(**/*.key)",
+           "Read(**/credentials.json)",
+           "Read(**/secrets/**)",
+           "Read(node_modules/**)",
+           "Read(dist/**)",
+           "Read(build/**)",
+           "Edit(.env)",
+           "Edit(.env.*)",
+           "Edit(**/*.pem)",
+           "Edit(**/*.key)",
+           "Edit(**/credentials.json)",
+           "Edit(**/secrets/**)",
+           "Edit(node_modules/**)",
+           "Edit(dist/**)",
+           "Edit(build/**)"
          ]
        }
      }

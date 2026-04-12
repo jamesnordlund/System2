@@ -5,6 +5,45 @@ All notable changes to System2 are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-04-11
+
+### Fixed
+
+- `repo-governor` agent template for `.claude/settings.json` now uses correct `Read(pattern)`/`Edit(pattern)` syntax for `permissions.deny` rules. Bare glob patterns were silently ignored or produced warnings at startup.
+
+## [0.4.0] - 2026-04-11
+
+Anti-additive bias and simplification pass across agents, hooks, and evals to reduce generated slop.
+
+### Added
+
+- Simplification step in post-execution workflow: `code-reviewer` runs in a new simplification mode when diffs exceed 50 lines or touch more than 2 files, identifying removable abstractions, wrappers, comments, and dead code.
+- Slop catalog integration: `code-reviewer` reads `.claude/slop-catalog.md` for project-specific anti-patterns and suggests new entries; `executor` treats catalog entries as local convention.
+- Write-lease lifecycle in orchestrator: per-task file path constraints written to `.task-lease.regex` before execution, enforced by `validate-file-paths.py`, cleaned up after completion.
+- Change budget reporting: `change-budget-reporter.py` SubagentStop hook reads `.task-budget.json` and reports surface-area metrics (files changed, symbols added, lines delta).
+- Module boundary enforcement: `boundary-check.py` PreToolUse hook validates imports against `spec/module-boundaries.json`.
+- Boundary artifact outputs for `design-architect`: emits `spec/interfaces.json` (public exports per module) and `spec/module-boundaries.json` (allowed/forbidden import paths) alongside `spec/design.md`.
+- Anti-slop sequence eval suite (`evals/fixtures/anti-slop-sequence/`): 4-task progressive coding sequence with golden files testing whether the executor avoids unnecessary abstractions across sequential changes.
+- `EVAL-SEC-004` eval validating all allowlist `.regex` files contain compilable patterns.
+- Stale task-lease/budget file cleanup during session bootstrap.
+
+### Changed
+
+- `executor`: added anti-additive bias rules (prefer deletion over addition, justify every new symbol, removal pass after green tests), assumptions-first protocol for non-trivial tasks.
+- `code-reviewer`: expanded review checklist with minimality and adaptation cost criteria; surface-area delta reporting; future-change probe now covers two requirements instead of one.
+- `design-architect`: new required sections in `spec/design.md` — "Simplicity Budget" (caps on new modules/interfaces, mandatory do-nothing alternative) and "Rejected Abstractions".
+- `spec-coordinator`: new required section "Minimal Change Intent" in `spec/context.md`.
+- `task-planner`: tasks now include `change_budget` (max files, max new symbols, interface policy) and `write_lease` (file path regex patterns) fields.
+- Delegation contract in orchestrator CLAUDE.md: added "Non-goals" and "Change shape" fields.
+- Hook utilities (`_hook_utils.py`): trimmed verbose docstrings, removed unused `check_command_exists`, `get_tool_input()` now returns None on parse failure.
+- `dangerous-command-blocker.py`, `sensitive-file-protector.py`, `auto-formatter.py`, `type-checker.py`, `tts-notify.py`, `validate-file-paths.py`: reduced to minimal implementations, removed narrative docstrings and dead code.
+
+### Removed
+
+- `dangerous-commands-allowlist.regex` and `sensitive-patterns.regex` — patterns now embedded directly in their respective hooks.
+- `example-hooks-config.md` — removed in favor of `HOOKS.md`.
+- Unused helper functions and verbose docstring boilerplate across all hooks.
+
 ## [0.3.0] - 2026-03-15
 
 Add a bounded corrective path for non-local regressions while preserving the existing fast path for routine implementation.

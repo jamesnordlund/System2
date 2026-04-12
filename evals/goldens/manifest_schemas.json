@@ -1,11 +1,11 @@
 {
   "description": "Expected field values for plugin.json and marketplace.json",
-  "version": "0.3.0",
+  "version": "0.4.1",
   "plugin_json": {
     "path": "plugin/.claude-plugin/plugin.json",
     "required_fields": {
       "name": "system2",
-      "version": "0.3.0",
+      "version": "0.4.1",
       "author.name": "James Nordlund"
     },
     "required_field_names": [
@@ -34,6 +34,6 @@
   },
   "version_file": {
     "path": "VERSION",
-    "expected_content": "0.3.0"
+    "expected_content": "0.4.1"
   }
 }

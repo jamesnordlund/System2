@@ -1,0 +1,54 @@
+{
+  "description": "Fixture repository for MAINT eval category. A small Python calculator project evolved through three sequential tasks in the same subsystem.",
+  "version": "1.0.0",
+  "modules": ["calculator.py", "formatter.py"],
+  "test_file": "test_calculator.py",
+  "snapshots": ["baseline", "task-A", "task-B", "task-C"],
+  "sequence": [
+    {
+      "from": "baseline",
+      "to": "task-A",
+      "description": "Add divide function with zero-division guard and tests",
+      "diff_lines_changed": 26,
+      "new_public_exports": ["calculator.divide"],
+      "net_new_export_count": 1,
+      "baseline_tests_preserved": 6,
+      "baseline_tests_total": 6,
+      "test_preservation_rate": 1.0
+    },
+    {
+      "from": "task-A",
+      "to": "task-B",
+      "description": "Add power and square_root functions with validation and tests",
+      "diff_lines_changed": 45,
+      "diff_growth_ratio_vs_previous": 1.73,
+      "new_public_exports": ["calculator.power", "calculator.square_root"],
+      "net_new_export_count": 2,
+      "baseline_tests_preserved": 6,
+      "baseline_tests_total": 6,
+      "test_preservation_rate": 1.0
+    },
+    {
+      "from": "task-B",
+      "to": "task-C",
+      "description": "Add batch_calculate and format_table functions with tests",
+      "diff_lines_changed": 46,
+      "diff_growth_ratio_vs_previous": 1.02,
+      "new_public_exports": ["calculator.batch_calculate", "formatter.format_table"],
+      "net_new_export_count": 2,
+      "baseline_tests_preserved": 6,
+      "baseline_tests_total": 6,
+      "test_preservation_rate": 1.0
+    }
+  ],
+  "expected_metrics": {
+    "max_diff_growth_ratio": 1.73,
+    "max_new_exports_per_task": 2,
+    "min_test_preservation_rate": 1.0
+  },
+  "constraints": {
+    "no_external_dependencies": true,
+    "stdlib_only": true,
+    "self_contained": true
+  }
+}

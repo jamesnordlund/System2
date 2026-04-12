@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
-"""
-dangerous-command-blocker.py - Claude Code PreToolUse hook
-
-Blocks dangerous Bash commands that could cause data loss or system damage.
-
-Inspiration: https://github.com/RoaringFerrum/claude-code-bash-guardian
-Pattern architecture: https://github.com/anthropics/claude-code/wiki/Hooks
-Pattern loading adapted from: validate-file-paths.py in this repository
-"""
+"""Blocks dangerous Bash commands that could cause data loss or system damage."""
 from __future__ import annotations
 
 import argparse
@@ -148,18 +140,7 @@ QUOTED_STRING_PATTERN = re.compile(r'''(["'])(?:(?!\1)[^\\]|\\.)*\1''')
 
 
 def is_echo_or_print_only(command: str, match_span: Tuple[int, int]) -> bool:
-    """Check if a pattern match occurs only within an echo/printf string literal.
-
-    This allows commands like `echo "rm -rf /"` to pass through, since they are
-    just printing text, not executing dangerous commands.
-
-    Args:
-        command: The full command string.
-        match_span: Tuple of (start, end) positions of the dangerous pattern match.
-
-    Returns:
-        True if the match is only inside a quoted string following echo/printf.
-    """
+    """Return True if the match is inside a quoted string following echo/printf."""
     match_start, match_end = match_span
 
     # Find all quoted strings in the command
@@ -192,37 +173,12 @@ def is_echo_or_print_only(command: str, match_span: Tuple[int, int]) -> bool:
 
 
 def check_dangerous_pattern(command: str) -> Tuple[bool, str]:
-    """Check if a command matches any dangerous patterns.
-
-    Handles piped/chained commands by checking each segment.
-
-    Args:
-        command: The Bash command string to check.
-
-    Returns:
-        Tuple of (is_dangerous, reason). If not dangerous, reason is empty.
-    """
-    # Split command by pipes and command separators to check each segment
-    # This handles cases like: echo foo | rm -rf /
-    # We check the full command first, then individual segments
-    segments = re.split(r'[|;&]', command)
-
+    """Check if a command matches any dangerous patterns."""
     for pattern, reason in DANGER_PATTERNS:
-        # Check the full command
         match = pattern.search(command)
         if match:
             if not is_echo_or_print_only(command, match.span()):
                 return (True, reason)
-
-        # Also check individual segments (for piped commands)
-        for segment in segments:
-            segment = segment.strip()
-            if not segment:
-                continue
-            match = pattern.search(segment)
-            if match:
-                if not is_echo_or_print_only(segment, match.span()):
-                    return (True, reason)
 
     return (False, "")
 
@@ -247,24 +203,32 @@ def main() -> None:
 
     # Parse TOOL_INPUT
     payload = get_tool_input()
+    if payload is None:
+        sys.exit(1)
     command = payload.get("command", "")
 
     if not command:
         # No command to check
         sys.exit(0)
 
-    # Load allowlist if provided
+    # Load allowlist if provided — fail hard if the file was explicitly
+    # requested but cannot be loaded, so silent policy gaps don't occur.
     allowlist_pattern: re.Pattern | None = None
     if args.allowlist:
         try:
             allowlist_pattern = load_patterns(args.allowlist)
         except FileNotFoundError:
             log_warn(HOOK_NAME, f"Allowlist file not found: {args.allowlist}")
-            # Continue without allowlist
+            block_response(
+                f"Blocked: allowlist file not found ({args.allowlist}). "
+                "Cannot verify command safety without the allowlist."
+            )
         except SystemExit:
-            # load_patterns exits on error, but we want to continue without allowlist
             log_warn(HOOK_NAME, f"Failed to load allowlist: {args.allowlist}")
-            allowlist_pattern = None
+            block_response(
+                f"Blocked: failed to load allowlist ({args.allowlist}). "
+                "Cannot verify command safety with a broken allowlist."
+            )
 
     # Check allowlist first - if command matches allowlist, allow it
     if allowlist_pattern and allowlist_pattern.search(command):

@@ -43,6 +43,8 @@ Planning rules:
   * Steps (concrete)
   * Verification (commands/tests; reference CLAUDE.md; do not guess)
   * Rollback / Backout note (when applicable)
+  * Change budget: max_files, max_new_symbols (functions, classes, exports), interface_policy (none / extend-only / breaking with approval)
+  * Write lease (write_lease): a list of file path patterns (regex-per-line format matching `plugin/allowlists/*.regex` convention) that the executor is expected to modify during that task. Patterns should be anchored (e.g., `^src/auth/token\.py$`). Be conservative: include files the executor will likely edit, plus immediately adjacent test files. Patterns that are too broad defeat the purpose of lease enforcement. This field is optional for backward compatibility; tasks without it fall back to `executor.regex`.
   * Risk level (Low/Med/High) and why
 
 spec/tasks.md must include these sections (headings exactly):

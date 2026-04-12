@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-System2 v0.3.0 Maintenance Loop Eval Harness
+System2 Eval Harness
 
 Deterministic structural assertions verifying the plugin conversion.
 Uses only Python 3.8+ standard library. No external dependencies.
@@ -13,13 +13,13 @@ Exit codes:
     1 - One or more evals fail
 """
 
+import difflib
 import json
-import os
 import re
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -29,6 +29,7 @@ from typing import Dict, List, Optional, Tuple
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent
 GOLDENS_DIR = SCRIPT_DIR / "goldens"
+FIXTURES_DIR = SCRIPT_DIR / "fixtures"
 PLUGIN_DIR = "plugin"
 
 
@@ -230,7 +231,6 @@ def eval_path_005():
     # Pattern: '...  "${CLAUDE_PLUGIN_ROOT}/hooks/...'  (double quote around variable+path)
     golden = load_golden("agent_inventory.json")
     bad_quoting = []
-    pattern = re.compile(r'"?\$\{?CLAUDE_PLUGIN_ROOT\}?[^"]*"')
     expected_pattern = re.compile(r'"\$\{CLAUDE_PLUGIN_ROOT\}/(?:hooks|allowlists)/[^"]*"')
     for filename in golden["agents"]:
         content = read_file(f"{PLUGIN_DIR}/agents/{filename}")
@@ -295,7 +295,9 @@ def eval_inv_003():
         len(actual_py) == golden["expected_py_count"]
         and len(actual_regex) == golden["expected_regex_count"]
         and not missing_py
+        and not extra_py
         and not missing_regex
+        and not extra_regex
     )
     msg_parts = []
     if missing_py:
@@ -806,6 +808,212 @@ def eval_sec_004():
 
 
 # ---------------------------------------------------------------------------
+# Maintenance eval helpers
+# ---------------------------------------------------------------------------
+
+def _load_fixture_snapshots() -> List[str]:
+    """Return the ordered list of snapshot names from the anti-slop-sequence fixture metadata."""
+    meta_path = FIXTURES_DIR / "anti-slop-sequence" / "metadata.json"
+    with open(meta_path) as f:
+        meta = json.load(f)
+    return meta["snapshots"]
+
+
+def _read_fixture_file(snapshot: str, filename: str) -> str:
+    """Read a file from a fixture snapshot directory."""
+    path = FIXTURES_DIR / "anti-slop-sequence" / snapshot / filename
+    if path.is_file():
+        return path.read_text(encoding="utf-8", errors="replace")
+    return ""
+
+
+def _compute_diff_lines(snapshot_a: str, snapshot_b: str) -> int:
+    """Count the total number of changed lines between two fixture snapshots.
+
+    Compares all files present in either snapshot and sums the number of
+    added/removed lines across all files.
+    """
+    dir_a = FIXTURES_DIR / "anti-slop-sequence" / snapshot_a
+    dir_b = FIXTURES_DIR / "anti-slop-sequence" / snapshot_b
+    all_files: set = set()
+    for d in (dir_a, dir_b):
+        if d.is_dir():
+            all_files.update(f.name for f in d.iterdir() if f.is_file())
+    total = 0
+    for fname in sorted(all_files):
+        content_a = _read_fixture_file(snapshot_a, fname)
+        content_b = _read_fixture_file(snapshot_b, fname)
+        lines_a = content_a.splitlines()
+        lines_b = content_b.splitlines()
+        diff = list(difflib.unified_diff(lines_a, lines_b))
+        # Count lines that start with + or - but not the header lines (+++/---)
+        for line in diff:
+            if (line.startswith("+") and not line.startswith("+++")) or \
+               (line.startswith("-") and not line.startswith("---")):
+                total += 1
+    return total
+
+
+def _extract_public_exports(content: str) -> List[str]:
+    """Extract public function and class names from Python source content.
+
+    Public exports are top-level ``def`` or ``class`` definitions whose name
+    does not start with an underscore.
+    """
+    exports = []
+    pattern = re.compile(r"^(?:def|class)\s+([A-Za-z_][A-Za-z0-9_]*)")
+    for line in content.splitlines():
+        m = pattern.match(line)
+        if m and not m.group(1).startswith("_"):
+            exports.append(m.group(1))
+    return exports
+
+
+def _extract_test_functions(content: str) -> List[str]:
+    """Extract test method names (def test_*) from test file content."""
+    funcs = []
+    pattern = re.compile(r"^\s+def\s+(test_[A-Za-z0-9_]+)")
+    for line in content.splitlines():
+        m = pattern.match(line)
+        if m:
+            funcs.append(m.group(1))
+    return funcs
+
+
+# ---------------------------------------------------------------------------
+# Maintenance eval implementations
+# ---------------------------------------------------------------------------
+
+def eval_maint_001():
+    """EVAL-MAINT-001: Diff-size growth ratio within threshold"""
+    try:
+        thresholds = load_golden("maintenance_thresholds.json")
+        max_ratio = thresholds["diff_size_growth_max_ratio"]
+        snapshots = _load_fixture_snapshots()
+    except FileNotFoundError as e:
+        record("EVAL-MAINT-001", "Diff-size growth ratio within threshold", False,
+               f"Fixture or golden file not found: {e}")
+        return
+
+    # Compute diff sizes between consecutive snapshots
+    diff_sizes = []
+    for i in range(len(snapshots) - 1):
+        size = _compute_diff_lines(snapshots[i], snapshots[i + 1])
+        diff_sizes.append((snapshots[i], snapshots[i + 1], size))
+
+    # Check growth ratios starting from the second transition
+    violations = []
+    for i in range(1, len(diff_sizes)):
+        prev_label = f"{diff_sizes[i-1][0]}->{diff_sizes[i-1][1]}"
+        curr_label = f"{diff_sizes[i][0]}->{diff_sizes[i][1]}"
+        prev_size = diff_sizes[i - 1][2]
+        curr_size = diff_sizes[i][2]
+        if prev_size == 0:
+            # Avoid division by zero; if previous diff was empty, any non-zero diff is infinite growth
+            if curr_size > 0:
+                violations.append(
+                    f"{curr_label}: diff={curr_size} but prior diff ({prev_label}) was 0"
+                )
+            continue
+        ratio = curr_size / prev_size
+        if ratio > max_ratio:
+            violations.append(
+                f"{curr_label}: ratio={ratio:.2f} (diff={curr_size} vs prior {prev_label} diff={prev_size}), "
+                f"max allowed={max_ratio}"
+            )
+
+    record(
+        "EVAL-MAINT-001",
+        "Diff-size growth ratio within threshold",
+        len(violations) == 0,
+        "; ".join(violations) if violations else "",
+    )
+
+
+def eval_maint_002():
+    """EVAL-MAINT-002: Interface churn within threshold"""
+    try:
+        thresholds = load_golden("maintenance_thresholds.json")
+        max_new = thresholds["interface_churn_max_new_exports_per_task"]
+        snapshots = _load_fixture_snapshots()
+        meta_path = FIXTURES_DIR / "anti-slop-sequence" / "metadata.json"
+        with open(meta_path) as f:
+            meta = json.load(f)
+        modules = meta["modules"]
+    except FileNotFoundError as e:
+        record("EVAL-MAINT-002", "Interface churn within threshold", False,
+               f"Fixture or golden file not found: {e}")
+        return
+
+    violations = []
+    for i in range(len(snapshots) - 1):
+        snap_from = snapshots[i]
+        snap_to = snapshots[i + 1]
+        label = f"{snap_from}->{snap_to}"
+        net_new_count = 0
+        for mod in modules:
+            exports_before = set(_extract_public_exports(_read_fixture_file(snap_from, mod)))
+            exports_after = set(_extract_public_exports(_read_fixture_file(snap_to, mod)))
+            new_exports = exports_after - exports_before
+            net_new_count += len(new_exports)
+        if net_new_count > max_new:
+            violations.append(
+                f"{label}: {net_new_count} net new exports, max allowed={max_new}"
+            )
+
+    record(
+        "EVAL-MAINT-002",
+        "Interface churn within threshold",
+        len(violations) == 0,
+        "; ".join(violations) if violations else "",
+    )
+
+
+def eval_maint_003():
+    """EVAL-MAINT-003: Test preservation rate above threshold"""
+    try:
+        thresholds = load_golden("maintenance_thresholds.json")
+        min_rate = thresholds["test_preservation_min_rate"]
+        snapshots = _load_fixture_snapshots()
+        meta_path = FIXTURES_DIR / "anti-slop-sequence" / "metadata.json"
+        with open(meta_path) as f:
+            meta = json.load(f)
+        test_file = meta["test_file"]
+    except FileNotFoundError as e:
+        record("EVAL-MAINT-003", "Test preservation rate above threshold", False,
+               f"Fixture or golden file not found: {e}")
+        return
+
+    baseline_content = _read_fixture_file(snapshots[0], test_file)
+    baseline_tests = set(_extract_test_functions(baseline_content))
+
+    if not baseline_tests:
+        record("EVAL-MAINT-003", "Test preservation rate above threshold", False,
+               "No test functions found in baseline")
+        return
+
+    violations = []
+    for snap in snapshots[1:]:
+        snap_content = _read_fixture_file(snap, test_file)
+        snap_tests = set(_extract_test_functions(snap_content))
+        preserved = baseline_tests & snap_tests
+        rate = len(preserved) / len(baseline_tests)
+        if rate < min_rate:
+            missing = sorted(baseline_tests - snap_tests)
+            violations.append(
+                f"{snap}: preservation={rate:.2f} ({len(preserved)}/{len(baseline_tests)}), "
+                f"min required={min_rate}, missing={missing}"
+            )
+
+    record(
+        "EVAL-MAINT-003",
+        "Test preservation rate above threshold",
+        len(violations) == 0,
+        "; ".join(violations) if violations else "",
+    )
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -846,6 +1054,10 @@ ALL_EVALS = [
     eval_sec_002,
     eval_sec_003,
     eval_sec_004,
+    # Maintenance
+    eval_maint_001,
+    eval_maint_002,
+    eval_maint_003,
 ]
 
 
@@ -853,7 +1065,7 @@ def main():
     start = time.time()
 
     print("=" * 70)
-    print("System2 v0.3.0 Maintenance Loop Eval Suite")
+    print("System2 Eval Suite")
     print(f"Repo root: {REPO_ROOT}")
     print(f"Goldens:   {GOLDENS_DIR}")
     print("=" * 70)
@@ -882,6 +1094,7 @@ def main():
         "CLN": "Cleanup",
         "DOC": "Documentation",
         "SEC": "Security",
+        "MAINT": "Maintenance",
     }
 
     passed = sum(1 for r in results if r.passed)

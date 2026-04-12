@@ -14,3 +14,7 @@ __pycache__/
 
 # Project
 spec*/
+
+# Ephemeral per-task files written during executor delegation
+plugin/allowlists/.task-lease.regex
+.task-budget.json

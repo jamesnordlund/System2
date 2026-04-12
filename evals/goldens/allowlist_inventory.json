@@ -1,7 +1,6 @@
 {
   "description": "Expected allowlist files in allowlists/ directory",
   "version": "0.3.0",
-  "traces": ["REQ-014"],
   "files": [
     "docs-release.regex",
     "executor.regex",

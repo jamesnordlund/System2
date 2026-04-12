@@ -1,7 +1,6 @@
 {
   "description": "Required section headings in the CLAUDE.md template (skills/init/SKILL.md)",
   "version": "0.3.0",
-  "traces": ["REQ-026"],
   "required_headings": [
     "Operating principles",
     "Session Bootstrap",

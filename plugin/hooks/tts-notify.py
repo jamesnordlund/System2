@@ -1,19 +1,5 @@
 #!/usr/bin/env python3
-"""
-tts-notify.py - TTS notification hook for Claude Code
-
-This hook announces task completion audibly using platform-specific
-text-to-speech commands. It triggers on Stop and SubagentStop events.
-
-Inspiration: https://github.com/disler/claude-code-hooks-mastery
-
-Usage:
-    python3 tts-notify.py stop      # Announces "Task complete"
-    python3 tts-notify.py subagent  # Announces "Subagent complete"
-
-Exit codes:
-    0 - Always (failures are silent)
-"""
+"""TTS notification hook — announces task completion audibly."""
 from __future__ import annotations
 
 import subprocess
@@ -27,14 +13,6 @@ MESSAGES = {
 
 
 def get_tts_command(message: str) -> list[str] | None:
-    """Get the platform-specific TTS command.
-
-    Args:
-        message: The text to speak.
-
-    Returns:
-        List of command arguments, or None if no TTS available.
-    """
     platform = sys.platform
 
     if platform == "darwin":
@@ -43,9 +21,10 @@ def get_tts_command(message: str) -> list[str] | None:
 
     elif platform == "win32":
         # Windows: use PowerShell with SpeechSynthesizer
+        escaped = message.replace("'", "''")
         ps_script = (
             f"Add-Type -AssemblyName System.Speech; "
-            f"(New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('{message}')"
+            f"(New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('{escaped}')"
         )
         return ["powershell", "-Command", ps_script]
 
@@ -66,14 +45,6 @@ def get_tts_command(message: str) -> list[str] | None:
 
 
 def speak(message: str) -> None:
-    """Speak a message using platform TTS.
-
-    This function catches ALL exceptions silently - TTS failure
-    should never cause the hook to report an error.
-
-    Args:
-        message: The text to speak.
-    """
     try:
         tts_command = get_tts_command(message)
         if tts_command is None:
@@ -83,7 +54,6 @@ def speak(message: str) -> None:
             tts_command,
             timeout=10,
             capture_output=True,
-            shell=False,
         )
     except Exception:
         # Silently ignore all failures
@@ -91,11 +61,6 @@ def speak(message: str) -> None:
 
 
 def main() -> int:
-    """Main entry point for the TTS notification hook.
-
-    Returns:
-        Always returns 0.
-    """
     # Parse CLI argument
     if len(sys.argv) < 2:
         # No argument provided - exit silently

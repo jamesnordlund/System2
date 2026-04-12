@@ -306,90 +306,7 @@ System2 includes reusable hooks for safety, code quality, and notifications. The
 | `tts-notify.py` | Stop/SubagentStop | Announces task completion via TTS (macOS/Windows/Linux) |
 | `validate-file-paths.py` | PreToolUse (Edit/Write) | Restricts file writes to allowlisted paths |
 
-#### Enabling Hooks
-
-Add hooks to agent frontmatter:
-
-```yaml
----
-name: executor
-hooks:
-  PreToolUse:
-    - matcher: "Bash"
-      hooks:
-        - type: command
-          command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/dangerous-command-blocker.py"'
-    - matcher: "Read|Edit|Write|Bash"
-      hooks:
-        - type: command
-          command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/sensitive-file-protector.py"'
-  PostToolUse:
-    - matcher: "Edit|Write"
-      hooks:
-        - type: command
-          command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/auto-formatter.py"'
-        - type: command
-          command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/type-checker.py"'
-  Stop:
-    - type: command
-      command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/tts-notify.py" stop'
----
-```
-
-Or add to `.claude/settings.json` for global hooks:
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/dangerous-command-blocker.py\""
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-#### Hook Behavior
-
-**PreToolUse hooks** run before tool execution and can block operations:
-- Exit 0: Allow the operation
-- Exit 2: Block with JSON reason on stdout (`{"decision": "block", "reason": "..."}`)
-- Exit 1: Error (blocks implicitly)
-
-**PostToolUse hooks** run after tool completion and are informational only (always exit 0).
-
-**Stop/SubagentStop hooks** run when tasks complete (always exit 0).
-
-#### Custom Allowlists and Patterns
-
-The dangerous command blocker and sensitive file protector support optional pattern files:
-
-```bash
-# Allow specific commands that would otherwise be blocked
-python3 "${CLAUDE_PLUGIN_ROOT}/hooks/dangerous-command-blocker.py" "${CLAUDE_PLUGIN_ROOT}/hooks/dangerous-commands-allowlist.regex"
-
-# Add custom sensitive file patterns
-python3 "${CLAUDE_PLUGIN_ROOT}/hooks/sensitive-file-protector.py" "${CLAUDE_PLUGIN_ROOT}/hooks/sensitive-patterns.regex"
-```
-
-Pattern files use one regex per line (lines starting with `#` are comments).
-
-#### Debugging Hooks
-
-Set `CLAUDE_HOOK_DEBUG=1` for verbose output:
-
-```bash
-export CLAUDE_HOOK_DEBUG=1
-```
-
-See [hooks/HOOKS.md](hooks/HOOKS.md) for detailed documentation.
+Hooks are configured in agent frontmatter or `.claude/settings.json`. See [plugin/hooks/HOOKS.md](plugin/hooks/HOOKS.md) for configuration examples, exit code semantics, custom pattern files, and debugging.
 
 ## Advanced Topics
 
@@ -410,34 +327,11 @@ claude --agents '{
 
 ### Agent Priority Order
 
-When duplicates exist:
-1. `--agents` CLI flag (session only)
-2. `.claude/agents/` (project)
-3. `~/.claude/agents/` (user)
-4. Plugin `agents/` directory
-
-System2 agents live in the plugin `agents/` directory (priority 4). If you have project-level `.claude/agents/` files with the same names, those take priority and the plugin versions will not be used.
+Project-level `.claude/agents/` files take priority over plugin agents. If you have project-level files with the same names as System2 agents, the plugin versions will not be used.
 
 ### Managing Subagents
 
-Use the `/agents` command in Claude Code to:
-- Create new subagents
-- Edit existing subagents
-- Choose project vs user scope
-- Preview subagent configurations
-
-### Background vs Foreground Execution
-
-- **Foreground** (default): Blocking; full tool access
-- **Background**: Concurrent; auto-denies permissions; no MCP tools
-
-Use background runs for high-volume tasks like test suites or log processing.
-
-### Context and Resuming
-
-- Each subagent runs in its own context window
-- Transcripts stored in `~/.claude/projects/{project}/{sessionId}/subagents/`
-- Resume a prior subagent by asking Claude to continue its work
+Use the `/agents` command in Claude Code to create, edit, or preview subagent configurations.
 
 ### Delegation Contract Tips
 

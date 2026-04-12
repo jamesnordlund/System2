@@ -66,6 +66,8 @@ spec/design.md must include these sections (headings exactly):
 - Rollout Plan (staged rollout, feature flags, backout)
 - Alternatives Considered (at least 2, with pros/cons)
 - Open Design Questions
+- Simplicity Budget (maximum new modules, maximum new public interfaces, dependency addition policy, and a required "do nothing / smaller change" alternative that was evaluated)
+- Rejected Abstractions (abstractions considered and explicitly rejected with rationale)
 - Verification Strategy (mapping to requirements and test strategy)
 
 Design constraints:
@@ -81,6 +83,30 @@ Output quality bar:
 - A competent engineer should be able to implement from this design without major guesswork.
 - Where specifics depend on repo realities, include a "Discovery Needed" bullet with the exact file/owner to confirm.
 
+## Boundary Artifact Outputs
+
+Alongside spec/design.md, emit these two machine-readable artifacts on every design pass.
+Regenerate both files in full each time; do not attempt incremental updates.
+
+**spec/interfaces.json** -- declares public exports per module.
+Schema (top-level keys):
+- `version`: semver string
+- `modules`: object keyed by module path, each containing:
+  - `description`: string
+  - `public_exports`: array of `{ "name", "kind" (function|class|constant|type), "signature" }`
+  - `internal_only`: array of symbol name strings
+
+**spec/module-boundaries.json** -- declares module boundaries with allowed and forbidden import paths.
+Schema (top-level keys):
+- `version`: semver string
+- `boundaries`: array of objects, each containing:
+  - `module`: path prefix string
+  - `description`: string
+  - `allowed_imports_from`: array of module path prefixes
+  - `forbidden_imports_from`: array of module path prefixes
+
+Refer to spec/design.md section "Public Interfaces > 6. Boundary Artifact Schemas" for full schema definitions and examples.
+
 Completion:
-- Edit or create spec/design.md only.
+- Edit or create spec/design.md, spec/interfaces.json, and spec/module-boundaries.json.
 - End with attempt_completion summarizing key decisions and highest-risk areas.

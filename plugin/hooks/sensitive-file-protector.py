@@ -1,14 +1,5 @@
 #!/usr/bin/env python3
-"""
-sensitive-file-protector.py - Claude Code PreToolUse hook
-
-Blocks access to credential and secret files to prevent accidental exposure of
-sensitive data through Read, Edit, Write, or Bash tool operations.
-
-Inspiration: https://github.com/disler/claude-code-damage-control
-Hook architecture: https://github.com/anthropics/claude-code/wiki/Hooks
-Pattern loading adapted from: validate-file-paths.py in this repository
-"""
+"""Blocks access to credential and secret files."""
 from __future__ import annotations
 
 import os
@@ -17,35 +8,16 @@ import shlex
 import sys
 from typing import Tuple
 
-# Import shared utilities
-try:
-    from _hook_utils import (
-        get_tool_input,
-        get_tool_name,
-        load_patterns,
-        normalize_path,
-        block_response,
-        log_info,
-        log_warn,
-        collect_paths,
-    )
-except ImportError:
-    # Handle case where script is run directly with different import path
-    import importlib.util
-    spec = importlib.util.spec_from_file_location(
-        "_hook_utils",
-        os.path.join(os.path.dirname(__file__), "_hook_utils.py")
-    )
-    _hook_utils = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(_hook_utils)
-    get_tool_input = _hook_utils.get_tool_input
-    get_tool_name = _hook_utils.get_tool_name
-    load_patterns = _hook_utils.load_patterns
-    normalize_path = _hook_utils.normalize_path
-    block_response = _hook_utils.block_response
-    log_info = _hook_utils.log_info
-    log_warn = _hook_utils.log_warn
-    collect_paths = _hook_utils.collect_paths
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _hook_utils import (
+    block_response,
+    collect_paths,
+    get_tool_input,
+    get_tool_name,
+    log_info,
+    log_warn,
+    normalize_path,
+)
 
 HOOK_NAME = "sensitive-file-protector"
 
@@ -84,17 +56,7 @@ SENSITIVE_PATTERNS: list[Tuple[re.Pattern, str]] = [
 
 
 def extract_paths_from_bash_command(command: str) -> list[str]:
-    """Extract file paths from a Bash command string.
-
-    Uses shell lexical analysis to parse command arguments, then filters
-    for strings that look like file paths (contain path separators, ~ or start with .).
-
-    Args:
-        command: The Bash command string to analyze.
-
-    Returns:
-        List of potential file paths found in the command.
-    """
+    """Extract potential file paths from a Bash command string via shlex."""
     paths: list[str] = []
 
     try:
@@ -130,89 +92,27 @@ def extract_paths_from_bash_command(command: str) -> list[str]:
     return paths
 
 
-def check_sensitive_path(path: str) -> Tuple[bool, str]:
-    """Check if a path matches any sensitive file pattern.
-
-    Normalizes the path (expands ~, resolves symlinks) and checks all
-    normalized variants against the sensitive patterns.
-
-    Args:
-        path: The file path to check.
-
-    Returns:
-        Tuple of (is_sensitive, reason). If is_sensitive is True, reason
-        contains the description of why the path is sensitive.
-    """
-    # Get all normalized variants of the path
+def check_sensitive_path(
+    path: str,
+    additional_patterns: list[Tuple[re.Pattern, str]] | None = None,
+) -> Tuple[bool, str]:
+    """Check if a path matches any built-in or additional sensitive pattern."""
     candidates = normalize_path(path)
 
-    # Also add resolved real path after tilde expansion
-    if path.startswith("~"):
-        expanded = os.path.expanduser(path)
-        candidates.append(expanded)
-        try:
-            real_expanded = os.path.realpath(expanded)
-            if real_expanded != expanded:
-                candidates.append(real_expanded)
-        except OSError:
-            pass
+    all_patterns = list(SENSITIVE_PATTERNS)
+    if additional_patterns:
+        all_patterns.extend(additional_patterns)
 
-    # Check each candidate against each pattern
     for candidate in candidates:
-        for pattern, description in SENSITIVE_PATTERNS:
+        for pattern, description in all_patterns:
             if pattern.search(candidate):
                 return (True, description)
 
     return (False, "")
 
 
-def check_sensitive_path_with_additional(
-    path: str, additional_patterns: list[Tuple[re.Pattern, str]] | None
-) -> Tuple[bool, str]:
-    """Check if a path matches sensitive patterns including additional ones.
-
-    Args:
-        path: The file path to check.
-        additional_patterns: Optional list of additional (pattern, description) tuples.
-
-    Returns:
-        Tuple of (is_sensitive, reason).
-    """
-    # First check built-in patterns
-    is_sensitive, reason = check_sensitive_path(path)
-    if is_sensitive:
-        return (is_sensitive, reason)
-
-    # Then check additional patterns if provided
-    if additional_patterns:
-        candidates = normalize_path(path)
-        if path.startswith("~"):
-            expanded = os.path.expanduser(path)
-            candidates.append(expanded)
-            try:
-                real_expanded = os.path.realpath(expanded)
-                if real_expanded != expanded:
-                    candidates.append(real_expanded)
-            except OSError:
-                pass
-
-        for candidate in candidates:
-            for pattern, description in additional_patterns:
-                if pattern.search(candidate):
-                    return (True, description)
-
-    return (False, "")
-
-
 def load_additional_patterns(file_path: str) -> list[Tuple[re.Pattern, str]] | None:
-    """Load additional sensitive patterns from a file.
-
-    Args:
-        file_path: Path to the patterns file.
-
-    Returns:
-        List of (compiled_pattern, description) tuples, or None if loading fails.
-    """
+    """Load additional sensitive patterns from a file. Returns None on failure."""
     try:
         patterns: list[Tuple[re.Pattern, str]] = []
         with open(file_path, "r", encoding="utf-8") as handle:
@@ -239,17 +139,22 @@ def load_additional_patterns(file_path: str) -> list[Tuple[re.Pattern, str]] | N
 
 
 def main() -> int:
-    """Main entry point for the sensitive file protector hook.
-
-    Returns:
-        Exit code: 0 to allow, 1 for errors, 2 to block (with JSON on stdout).
-    """
-    # Parse optional patterns file argument
+    # Parse optional patterns file argument — fail hard if a patterns file
+    # was explicitly provided but cannot be loaded, to prevent silent gaps.
     additional_patterns: list[Tuple[re.Pattern, str]] | None = None
     if len(sys.argv) > 1:
         patterns_file = sys.argv[1]
         additional_patterns = load_additional_patterns(patterns_file)
-        if additional_patterns:
+        if additional_patterns is None:
+            log_warn(
+                HOOK_NAME,
+                f"Patterns file provided but could not be loaded: {patterns_file}"
+            )
+            block_response(
+                f"Blocked: sensitive-patterns file could not be loaded ({patterns_file}). "
+                "Cannot verify file safety without the custom patterns."
+            )
+        else:
             log_info(
                 HOOK_NAME,
                 f"Loaded {len(additional_patterns)} additional patterns from {patterns_file}"
@@ -258,6 +163,8 @@ def main() -> int:
     # Get tool name and input
     tool_name = get_tool_name()
     tool_input = get_tool_input()
+    if tool_input is None:
+        return 1
 
     # Extract paths based on tool type
     paths_to_check: list[str] = []
@@ -291,9 +198,7 @@ def main() -> int:
 
     # Check each path against sensitive patterns
     for path in paths_to_check:
-        is_sensitive, reason = check_sensitive_path_with_additional(
-            path, additional_patterns
-        )
+        is_sensitive, reason = check_sensitive_path(path, additional_patterns)
         if is_sensitive:
             log_warn(HOOK_NAME, f"Blocked access to sensitive path: {path}")
             block_response(

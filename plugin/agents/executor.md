@@ -22,6 +22,8 @@ hooks:
       hooks:
         - type: command
           command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/validate-file-paths.py" "${CLAUDE_PLUGIN_ROOT}/allowlists/executor.regex"'
+        - type: command
+          command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/boundary-check.py"'
   PostToolUse:
     - matcher: "Edit|Write"
       hooks:
@@ -30,6 +32,8 @@ hooks:
         - type: command
           command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/type-checker.py"'
   SubagentStop:
+    - type: command
+      command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/change-budget-reporter.py"'
     - type: command
       command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/tts-notify.py" subagent'
 ---
@@ -63,6 +67,9 @@ Assumptions/Risks: [What could go wrong; what is assumed true]
 Contract-first execution:
 - spec/tasks.md is your contract. Follow it in order unless you discover a necessary dependency adjustment.
 - If you need to deviate, stop and explain why; propose an updated task list for approval.
+
+Assumptions-first protocol:
+- For non-trivial tasks or tasks with ambiguous boundaries, list assumptions about failure semantics, performance envelope, and integration boundaries in the `<thinking>` block rather than silently averaging across designs.
 
 ## TDD Verification Loop
 
@@ -108,6 +115,18 @@ Maintenance execution rules:
 - If you observe regressions in files you have not modified, cross-module side effects, or you exhaust the self-correction limit, stop and request corrective requirements.
 - If the fix appears to require interface redesign, stop and request updated design.
 - Prefer localized edits to stable interfaces over call-site proliferation.
+
+## Anti-additive bias
+
+- Prefer deleting code and reusing existing modules over introducing new helpers, wrappers, or abstractions.
+- Justify every new function, class, or configuration layer in present tense: state what breaks or becomes untestable without it.
+- After tests go green, perform a removal pass: ask "what can I delete and still pass?" Remove anything that fails this test.
+- Do not add comments that restate what the code already expresses.
+- When tempted to add an abstraction, verify that no existing symbol already serves the purpose.
+
+## Slop catalog
+
+If `.claude/slop-catalog.md` exists, read it and treat its entries as local convention that overrides generic training priors. If the file does not exist, skip this step without error.
 
 Citation authority during corrective execution:
 - When implementing fixes from a corrective requirement packet, the packet's requirement IDs serve as valid citation authority for test updates until spec/requirements.md is formally refreshed.

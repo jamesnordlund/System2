@@ -1,27 +1,17 @@
 #!/usr/bin/env python3
-"""
-auto-formatter.py - Claude Code PostToolUse hook
-
-Automatically runs code formatters on files after they are modified via Edit or Write tools.
-Supports multiple formatters based on file extension with graceful degradation when
-formatters are not installed.
-
-Inspiration: https://docs.anthropic.com/en/docs/claude-code/hooks
-Pattern inspired by: validate-file-paths.py and _hook_utils.py in this repository
-"""
+"""Runs code formatters on files after Edit or Write."""
 from __future__ import annotations
 
 import os
-import subprocess
+import shutil
 import sys
 
-# Import shared utilities from the same directory
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _hook_utils import (
-    check_command_exists,
     get_tool_input,
     log_info,
     log_warn,
+    run_subprocess,
 )
 
 HOOK_NAME = "auto-formatter"
@@ -44,15 +34,6 @@ FORMATTER_MAP: dict[str, tuple[str, list[str]]] = {
 
 
 def get_formatter_for_file(file_path: str) -> tuple[str, list[str]] | None:
-    """Determine the appropriate formatter for a file based on its extension.
-
-    Args:
-        file_path: Path to the file being formatted.
-
-    Returns:
-        Tuple of (formatter_name, command_args) where command_args includes
-        the file path appended, or None if no formatter matches.
-    """
     _, ext = os.path.splitext(file_path)
     ext_lower = ext.lower()
 
@@ -66,72 +47,37 @@ def get_formatter_for_file(file_path: str) -> tuple[str, list[str]] | None:
 
 
 def main() -> None:
-    """Main entry point for the auto-formatter hook.
-
-    Parses TOOL_INPUT to extract the file path, determines the appropriate
-    formatter, and runs it if installed. Always exits with code 0.
-    """
-    # Parse TOOL_INPUT to get the file path
     payload = get_tool_input()
-    file_path = payload.get("file_path")
-
-    if not file_path:
-        # No file_path in input, nothing to format
+    if payload is None:
+        log_warn(HOOK_NAME, "Could not parse TOOL_INPUT, skipping formatting")
         sys.exit(0)
 
-    # Check if file exists (may have been deleted after Edit/Write)
+    file_path = payload.get("file_path")
+    if not file_path:
+        sys.exit(0)
+
     if not os.path.exists(file_path):
         log_warn(HOOK_NAME, f"File does not exist (may have been deleted): {file_path}")
         sys.exit(0)
 
-    # Determine formatter for this file type
     formatter_result = get_formatter_for_file(file_path)
     if formatter_result is None:
-        # No formatter for this extension, silently exit
         sys.exit(0)
 
     formatter_name, command_args = formatter_result
 
-    # Check if formatter is installed
-    if not check_command_exists(formatter_name):
+    if not shutil.which(formatter_name):
         log_warn(HOOK_NAME, f"{formatter_name} not found in PATH, skipping formatting for {file_path}")
         sys.exit(0)
 
-    # Log what we're doing
     log_info(HOOK_NAME, f"Running {formatter_name} on {file_path}")
 
-    # Run the formatter with timeout
-    try:
-        result = subprocess.run(
-            command_args,
-            capture_output=True,
-            text=True,
-            timeout=30,
-            shell=False,  # Explicitly disable shell to prevent injection
-        )
+    returncode, stdout, stderr = run_subprocess(command_args)
+    if stderr:
+        print(stderr, file=sys.stderr, end="")
+    if returncode == -1 and "timed out" in stderr.lower():
+        log_warn(HOOK_NAME, f"{formatter_name} timed out after 30s")
 
-        # Forward stderr to hook stderr if there's any output
-        if result.stderr:
-            print(result.stderr, file=sys.stderr, end="")
-
-    except subprocess.TimeoutExpired as exc:
-        # Kill the process if it times out
-        if exc.args and hasattr(exc, "cmd"):
-            log_warn(HOOK_NAME, f"{formatter_name} timed out after 30s, killing process")
-        else:
-            log_warn(HOOK_NAME, f"{formatter_name} timed out after 30s")
-        # Process is already terminated by subprocess.run on timeout
-        sys.exit(0)
-
-    except FileNotFoundError:
-        log_warn(HOOK_NAME, f"{formatter_name} not found: {command_args[0]}")
-        sys.exit(0)
-
-    except OSError as exc:
-        log_warn(HOOK_NAME, f"OS error running {formatter_name}: {exc}")
-        sys.exit(0)
-
-    # Always exit 0 regardless of formatter outcome
     sys.exit(0)
 
 

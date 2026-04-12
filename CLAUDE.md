@@ -33,6 +33,7 @@ At the start of each new session, assess the spec artifact state before proceedi
 
 4. If all spec files are missing, prompt the user for scope definition or delegate to system2:spec-coordinator
 5. Use this assessment to determine the appropriate first delegation
+6. Check for stale per-task files: if `plugin/allowlists/.task-lease.regex` or `.task-budget.json` exist at session start, delete them and log a warning ("Stale task-lease/budget file found and removed"). Stale files indicate a previous session terminated mid-task.
 
 This bootstrap is for initial orientation only. Agents always read fresh file state before making changes.
 
@@ -68,6 +69,8 @@ When delegating, include:
 - Inputs (files to read or discover)
 - Outputs (files to create/update and required sections)
 - Constraints (what not to do; allowed assumptions)
+- Non-goals (what this delegation explicitly will NOT address)
+- Change shape (minimal patch / refactor / new interface / migration)
 - Completion summary requirements (files changed, commands run, decisions, risks)
 
 ## Post-Execution Workflow
@@ -80,6 +83,7 @@ After system2:executor completes with `attempt_completion`, automatically evalua
 2. If executor status is not success, do not trigger post-execution; report failure to user
 3. Evaluate trigger conditions:
    - system2:test-engineer: Always trigger
+   - Simplification (code-reviewer in simplification mode): Trigger if diff exceeds 50 lines changed or touches more than 2 files
    - system2:security-sentinel: Trigger if any changed file path or content matches security patterns (auth, login, permission, role, secret, credential, token, password, session, oauth, jwt, encrypt, decrypt, sanitize)
    - system2:eval-engineer: Trigger if any changed file matches agent definitions or contains agentic patterns (system prompt, LLM, tool interface)
    - system2:docs-release: Trigger if any changed file matches user-facing patterns (README, docs/, CHANGELOG, cli, api, endpoint)
@@ -96,21 +100,53 @@ After system2:executor completes with `attempt_completion`, automatically evalua
    ```
    Post-execution agents to run:
    1. system2:test-engineer (always)
-   2. system2:security-sentinel (triggered: auth changes in src/auth.ts)
-   3. system2:docs-release (triggered: README.md modified)
-   4. system2:code-reviewer (always)
+   2. system2:code-reviewer in simplification mode (triggered: diff >50 lines or >2 files)
+   3. system2:security-sentinel (triggered: auth changes in src/auth.ts)
+   4. system2:docs-release (triggered: README.md modified)
+   5. system2:code-reviewer (always)
 
    Skipping: system2:eval-engineer (no agentic changes detected)
 
    Approve this plan, or specify agents to skip (e.g., "skip system2:security-sentinel").
    ```
 3. Wait for user approval or override
-4. Execute agents sequentially in order: system2:test-engineer -> system2:security-sentinel -> system2:eval-engineer -> system2:docs-release -> system2:code-reviewer
+4. Execute triggered agents sequentially in this order (skip any not triggered in step 3): system2:test-engineer -> simplification (code-reviewer in simplification mode) -> system2:security-sentinel -> system2:eval-engineer -> system2:docs-release -> system2:code-reviewer
 5. After each agent completes:
    - Append completion summary to `spec/post-execution-log.md`
    - If status=success: proceed to next agent
    - If status=blockers: pause and present blocker gate (see Blocker Handling)
    - If status=failure: present retry/skip/abort options
+   - If code-reviewer output includes "Suggested catalog entries", write approved entries to `.claude/slop-catalog.md` (create the file with a `# Slop Pattern Catalog` header if it does not exist)
+
+### Simplification Step
+
+The simplification step delegates to system2:code-reviewer in simplification mode. Trigger condition: the executor's diff exceeds 50 lines changed or touches more than 2 files. For small, well-scoped changes, skip this step.
+
+**Delegation objective:** "Identify removable abstractions, wrappers, comments, and dead code in the executor's changes. Do NOT perform a full correctness review. Output structured findings in four categories: removable abstractions, removable wrappers, removable comments, dead code. Each item identifies file path and symbol or line range."
+
+If simplification identifies removable code, findings are presented as blockers following the existing Blocker Handling flow. The corrective cycle cap of 3 applies.
+
+If the simplification step fails or times out, skip it and proceed to the next agent. Log the failure in `spec/post-execution-log.md`.
+
+### Write-Lease Lifecycle
+
+Before delegating a task to system2:executor:
+
+1. Read the task's `write_lease` and `change_budget` fields from `spec/tasks.md`.
+2. If `write_lease` is present and non-empty, write the patterns (one regex per line) to `plugin/allowlists/.task-lease.regex`.
+3. If `change_budget` is present, write it as JSON to `.task-budget.json` at the repo root (read by the `change-budget-reporter.py` SubagentStop hook).
+4. If either field is absent, skip writing the corresponding file. The executor falls back to its global allowlist (`executor.regex`) when no lease exists; the budget reporter silently no-ops when no budget file exists.
+5. If a file cannot be written (permission error, disk full), log a warning and proceed without that constraint.
+
+After task completion (success or failure):
+
+1. Delete `plugin/allowlists/.task-lease.regex` and `.task-budget.json`. If either file is already absent, this is a no-op.
+
+If the executor reports a lease block (edit blocked by `.task-lease.regex`):
+
+1. Present the blocked file path and the current lease patterns to the user.
+2. Offer options: (a) expand the lease to include the requested path, (b) abort the task.
+3. If expanded, update `.task-lease.regex` and log the override in `spec/post-execution-log.md`.
 
 ### Blocker Handling
 

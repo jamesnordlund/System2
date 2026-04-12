@@ -51,6 +51,7 @@ spec/context.md must include these sections (headings exactly):
 - Observability / Telemetry expectations
 - Rollout & Backward Compatibility (if applicable)
 - Open Questions (with owner and how to resolve)
+- Minimal Change Intent (existing modules expected to absorb the change, abstractions explicitly out of scope unless later approved, API surface that must remain unchanged unless explicitly required)
 - Glossary (define overloaded terms)
 
 Style requirements:

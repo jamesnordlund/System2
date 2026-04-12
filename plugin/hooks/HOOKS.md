@@ -113,7 +113,7 @@ hooks:
     - matcher: "Bash"
       hooks:
         - type: command
-          command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/dangerous-command-blocker.py" "${CLAUDE_PLUGIN_ROOT}/hooks/dangerous-commands-allowlist.regex"'
+          command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/dangerous-command-blocker.py" "path/to/your-allowlist.regex"'
 ```
 
 ---
@@ -178,7 +178,7 @@ hooks:
     - matcher: "Read|Edit|Write|Bash"
       hooks:
         - type: command
-          command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/sensitive-file-protector.py" "${CLAUDE_PLUGIN_ROOT}/hooks/sensitive-patterns.regex"'
+          command: 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/sensitive-file-protector.py" "path/to/your-patterns.regex"'
 ```
 
 ---
@@ -563,16 +563,15 @@ The `_hook_utils.py` module provides common functions used by all hooks:
 | `normalize_path(path)` | Generate path variants (tilde expansion, symlink resolution) |
 | `block_response(reason)` | Print JSON block response and exit 2 |
 | `log_info/warn/error(hook, msg)` | Log to stderr with hook prefix |
-| `get_tool_input()` | Parse TOOL_INPUT env var as JSON |
+| `get_tool_input()` | Parse TOOL_INPUT env var as JSON (returns None on failure) |
 | `get_tool_name()` | Read TOOL_NAME env var |
-| `check_command_exists(cmd)` | Check if command is in PATH |
 | `run_subprocess(args, timeout)` | Safe list-based subprocess execution |
 
 ---
 
 ## Security Considerations
 
-- **No shell execution:** All subprocess calls use `shell=False` to prevent injection
+- **No shell execution:** All subprocess calls use list-based invocation (never `shell=True`)
 - **Input validation:** TOOL_INPUT is parsed as JSON, never executed
 - **Path normalization:** Symlinks resolved to prevent bypass
 - **Allowlist approach:** Dangerous patterns are blocked by default; allowlists are opt-in

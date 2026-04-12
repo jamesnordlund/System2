@@ -1,0 +1,7 @@
+{
+  "description": "Thresholds for MAINT eval category. Adjustable without code changes.",
+  "version": "1.0.0",
+  "diff_size_growth_max_ratio": 2.0,
+  "interface_churn_max_new_exports_per_task": 5,
+  "test_preservation_min_rate": 0.95
+}

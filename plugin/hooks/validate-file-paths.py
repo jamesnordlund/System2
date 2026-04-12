@@ -1,63 +1,10 @@
 #!/usr/bin/env python3
 import json
 import os
-import re
 import sys
 
-PATH_KEYS = {
-    "file_path",
-    "filepath",
-    "path",
-    "target_file",
-    "filename",
-    "file",
-}
-
-
-def load_patterns(file_path: str) -> re.Pattern:
-    patterns = []
-    with open(file_path, "r", encoding="utf-8") as handle:
-        for line in handle:
-            stripped = line.strip()
-            if not stripped or stripped.startswith("#"):
-                continue
-            patterns.append(stripped)
-    if not patterns:
-        print(f"allowlist file has no patterns: {file_path}", file=sys.stderr)
-        sys.exit(1)
-    if len(patterns) == 1:
-        combined = patterns[0]
-    else:
-        combined = "|".join(f"(?:{pattern})" for pattern in patterns)
-    try:
-        return re.compile(combined)
-    except re.error as exc:
-        print(f"invalid allowlist regex: {exc}", file=sys.stderr)
-        sys.exit(1)
-
-
-def collect_paths(value, results):
-    if isinstance(value, dict):
-        for key, item in value.items():
-            if isinstance(item, str) and key.lower() in PATH_KEYS:
-                results.append(item)
-            else:
-                collect_paths(item, results)
-    elif isinstance(value, list):
-        for item in value:
-            collect_paths(item, results)
-
-
-def normalize_candidates(path: str) -> list:
-    candidates = [path]
-    if path.startswith("./"):
-        candidates.append(path[2:])
-    if os.path.isabs(path):
-        try:
-            candidates.append(os.path.relpath(path, os.getcwd()))
-        except ValueError:
-            pass
-    return list(dict.fromkeys(candidates))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _hook_utils import collect_paths, load_patterns, normalize_path
 
 
 def main() -> int:
@@ -67,6 +14,22 @@ def main() -> int:
 
     allowlist_file = sys.argv[1]
     pattern = load_patterns(allowlist_file)
+
+    # Check for task-lease file in the same directory as the primary allowlist.
+    # Fail open: if the lease file is malformed, log a warning and proceed
+    # without lease enforcement. The lease is a scope restriction, not a
+    # security boundary — the allowlist still enforces file-level security.
+    lease_file = os.path.join(os.path.dirname(allowlist_file), ".task-lease.regex")
+    lease_pattern = None
+    if os.path.isfile(lease_file):
+        try:
+            lease_pattern = load_patterns(lease_file)
+        except SystemExit:
+            print(
+                f"WARN: task-lease file could not be loaded: {lease_file}, proceeding without lease",
+                file=sys.stderr,
+            )
+            lease_pattern = None
 
     tool_input = os.environ.get("TOOL_INPUT")
     if tool_input is None:
@@ -92,14 +55,26 @@ def main() -> int:
     for path in paths:
         if not isinstance(path, str):
             continue
-        matched = False
-        for candidate in normalize_candidates(path):
+        allowlist_ok = False
+        lease_ok = False
+        # Break only when a candidate passes both gates; a candidate that
+        # matches the allowlist but not the lease keeps searching for a
+        # normalized form that satisfies both.
+        for candidate in normalize_path(path):
             if pattern.match(candidate):
-                matched = True
-                break
-        if not matched:
+                allowlist_ok = True
+                if lease_pattern is None or lease_pattern.match(candidate):
+                    lease_ok = True
+                    break
+        if not allowlist_ok:
             print(
                 f"file path not allowed: {path} (allowlist: {allowlist_file})",
+                file=sys.stderr,
+            )
+            return 1
+        if not lease_ok:
+            print(
+                f"file path blocked by task lease: {path} (lease: {lease_file})",
                 file=sys.stderr,
             )
             return 1

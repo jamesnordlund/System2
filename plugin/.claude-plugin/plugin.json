@@ -1,13 +1,14 @@
 {
   "name": "system2",
   "description": "Multi-agent engineering workflows with spec-driven quality gates, safety hooks, and structured verification.",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "author": {
     "name": "James Nordlund",
-    "url": "https://github.com/jamesnordlund"
+    "url": "https://github.com/DeliberateCode"
   },
-  "repository": "https://github.com/jamesnordlund/System2",
+  "repository": "https://github.com/DeliberateCode/System2",
   "license": "MIT",
+  "hooks": "./hooks/hooks.json",
   "agents": [
     "./agents/repo-governor.md",
     "./agents/spec-coordinator.md",

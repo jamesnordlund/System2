@@ -1,5 +1,15 @@
 # System2 - Multi-Agent Engineering Workflows
 
+> [!IMPORTANT]
+> **System2 has moved to [github.com/DeliberateCode/System2](https://github.com/DeliberateCode/System2).**
+> This repository (`jamesnordlund/System2`) is **frozen at v0.5.0** and will receive no further updates.
+> If you installed the plugin from here, switch to the maintained version:
+> ```
+> /plugin marketplace remove system2-marketplace
+> /plugin marketplace add DeliberateCode/System2
+> /plugin install system2@system2-marketplace
+> ```
+
 A framework for **deliberate, spec-driven, verification-first** software engineering with AI assistance.
 
 ## What is System2?
@@ -62,16 +72,26 @@ These artifacts serve as the contract between planning and execution.
 
 ## Installation
 
+> Install from the new home: **[DeliberateCode/System2](https://github.com/DeliberateCode/System2)**. The old `jamesnordlund/System2` marketplace is deprecated.
+
+### Migrating from the old marketplace
+
+If you previously added `jamesnordlund/System2`, remove it first so the marketplace name doesn't collide:
+
+```
+/plugin marketplace remove system2-marketplace
+```
+
 ### Step 1: Add the System2 Marketplace
 
 ```
-/plugin marketplace add jamesnordlund/System2
+/plugin marketplace add DeliberateCode/System2
 ```
 
 ### Step 2: Install the Plugin
 
 ```
-/plugin install system2@jamesnordlund-system2
+/plugin install system2@system2-marketplace
 ```
 
 This installs all 13 agents, hooks, allowlists, and the `/system2:init` command.

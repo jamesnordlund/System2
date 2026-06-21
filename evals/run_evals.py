@@ -334,13 +334,30 @@ def eval_inv_004():
 
 
 def eval_inv_005():
-    """EVAL-INV-005: hooks/hooks.json does NOT exist"""
-    exists = file_exists(f"{PLUGIN_DIR}/hooks/hooks.json")
+    """EVAL-INV-005: hooks/hooks.json wires the deprecation SessionStart notice
+
+    This repo is frozen and has moved to DeliberateCode/System2. Unlike the
+    per-agent hook wiring used elsewhere, the deprecation notice is a plugin-level
+    SessionStart hook, so hooks/hooks.json is expected to exist and declare it.
+    """
+    path = f"{PLUGIN_DIR}/hooks/hooks.json"
+    errors = []
+    if not file_exists(path):
+        errors.append(f"{path} does not exist")
+    else:
+        content = read_file(path)
+        try:
+            data = json.loads(content)
+        except json.JSONDecodeError as e:
+            data = None
+            errors.append(f"{path} is not valid JSON: {e}")
+        if data is not None and "SessionStart" not in data.get("hooks", {}):
+            errors.append(f"{path} does not declare a SessionStart hook")
     record(
         "EVAL-INV-005",
-        "plugin/hooks/hooks.json does NOT exist",
-        not exists,
-        "plugin/hooks/hooks.json exists but should not" if exists else "",
+        "plugin/hooks/hooks.json declares the deprecation SessionStart hook",
+        len(errors) == 0,
+        "; ".join(errors),
     )
 
 

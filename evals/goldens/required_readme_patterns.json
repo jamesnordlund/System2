@@ -4,12 +4,12 @@
   "must_contain": [
     {
       "id": "readme-marketplace-add",
-      "pattern": "plugin marketplace add jamesnordlund/System2",
+      "pattern": "plugin marketplace add DeliberateCode/System2",
       "description": "Plugin marketplace add command"
     },
     {
       "id": "readme-plugin-install",
-      "pattern": "plugin install system2@jamesnordlund-system2",
+      "pattern": "plugin install system2@system2-marketplace",
       "description": "Plugin install command"
     },
     {

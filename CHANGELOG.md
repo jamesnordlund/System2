@@ -5,6 +5,31 @@ All notable changes to System2 are documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-06-21
+
+**This repository has moved to [github.com/DeliberateCode/System2](https://github.com/DeliberateCode/System2).**
+
+This is the final release at the `jamesnordlund/System2` location, which is now frozen. All future development happens at the new location.
+
+### Added
+
+- `hooks/deprecation-notice.sh` — a `SessionStart` hook (wired via `hooks/hooks.json`) that shows users installed from this old marketplace a one-time notice (per machine) pointing to the new location, with the commands to switch.
+
+### Changed
+
+- README now leads with a relocation banner; install and migration instructions point to `DeliberateCode/System2` and `system2@system2-marketplace`.
+- `marketplace.json` and `plugin.json` `homepage`/`repository`/`owner`/`author` URLs now point to `github.com/DeliberateCode`.
+
+### Migration
+
+Switch your marketplace to the new home:
+
+```
+/plugin marketplace remove system2-marketplace
+/plugin marketplace add DeliberateCode/System2
+/plugin install system2@system2-marketplace
+```
+
 ## [0.4.1] - 2026-04-11
 
 ### Fixed

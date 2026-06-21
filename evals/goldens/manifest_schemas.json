@@ -1,11 +1,11 @@
 {
   "description": "Expected field values for plugin.json and marketplace.json",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "plugin_json": {
     "path": "plugin/.claude-plugin/plugin.json",
     "required_fields": {
       "name": "system2",
-      "version": "0.4.1",
+      "version": "0.5.0",
       "author.name": "James Nordlund"
     },
     "required_field_names": [
@@ -20,7 +20,7 @@
     "required_fields": {
       "owner": {
         "name": "James Nordlund",
-        "url": "https://github.com/jamesnordlund"
+        "url": "https://github.com/DeliberateCode"
       }
     },
     "required_field_names": [
@@ -34,6 +34,6 @@
   },
   "version_file": {
     "path": "VERSION",
-    "expected_content": "0.4.1"
+    "expected_content": "0.5.0"
   }
 }
